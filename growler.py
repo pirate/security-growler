@@ -66,14 +66,14 @@ try:
                 print "[>] secalert[%s]: %s" % (title, content)
         print "[i] Detected Growl version >= 2.0"
 except Exception as e:
-    if str(e).find("No module named") != -1:
-        print "[!] Growl support not installed, install it using:\n       `pip install gntp`"
-        def growlnotify(content="", title="Security Notification", icon="http://i.imgur.com/auYfC7O.png"):
-            if content:
-                print "[>] secnotify[%s]: %s" % (title, content)
-        def growlalert(content="", title="SECURITY ALERT", icon="http://i.imgur.com/auYfC7O.png"):
-            if content:
-                print "[>] secalert[%s]: %s" % (title, content)
+    print "[X] Error initializing: %s" % e
+    print "[!] Growl support not installed, install it using:\n       `pip install gntp`      for Growl version >=2.0\n       `pip install appscript` for Growl version <=1.3"
+    def growlnotify(content="", title="Security Notification", icon="http://i.imgur.com/auYfC7O.png"):
+        if content:
+            print "[>] secnotify[%s]: %s" % (title, content)
+    def growlalert(content="", title="SECURITY ALERT", icon="http://i.imgur.com/auYfC7O.png"):
+        if content:
+            print "[>] secalert[%s]: %s" % (title, content)
 
 def parse(line="", log_type=None):
     if log_type == "secure":
@@ -110,7 +110,7 @@ if __name__=="__main__":
         last_vnc_status = ""
 
         print("[+] Starting Security Growl Notifier.")
-        print("[i]  Sources to watch: \n       secure.log (ssh, sudo events)\n       access_log (pages served by webserver)\n       ftp.log (ftp connections)\n       lsof -i :5900 (VNC connctions)")
+        print("[i]  Watched sources: \n       secure.log (ssh, sudo events)\n       access_log (pages served by webserver)\n       ftp.log (ftp connections)\n       lsof -i :5900 (VNC connctions)")
         growlnotify("Started Security Growler.")
      
         secure = open(r'/var/log/secure.log', 'r')
