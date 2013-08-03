@@ -13,7 +13,7 @@ It's mostly userful if you're paranoid about people trying to hack into your com
   
 I was tired of not being able to find an app that would quell my paranoia about open ports, so I made one myself.  Now I can relax whenever I'm in a seedy internet cafe or connected to free Boingo airport wifi because I know if anyone is trying to connect to my computer.
 
-This app will notify you if any SSH, FTP, VNC, AFP, or sudo authentication events occur.  It also notifies you whenever a page is served by apache (althouh you may want to turn this off if you develop using it, getting a growl bubble on every pageload is annoying).  Simply comment out these three lines in `Security Growler.app/Contents/Resources/growler.py` to do so:  
+This app will notify you if any SSH, FTP, VNC, AFP, or sudo authentication events occur.  It also notifies you whenever a page is served by apache (although you may want to turn this off if you develop locally, getting growl bubbles on every pageload is annoying).  Simply comment out these three lines in `Security Growler.app/Contents/Resources/growler.py` to do so:  
 
 
   ```
