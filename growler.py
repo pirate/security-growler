@@ -67,7 +67,7 @@ try:
         print "[i] Detected Growl version >= 2.0"
 except Exception as e:
     print "[X] Error initializing: %s" % e
-    print "[!] Growl support not installed, install it using:\n       `pip install gntp`      for Growl version >=2.0\n       `pip install appscript` for Growl version <=1.3"
+    print "[!] Growl support not installed, install it using:\n       `easy_install install gntp`      for Growl version >=2.0\n       `easy_install install appscript` for Growl version <=1.3"
     def growlnotify(content="", title="Security Notification", icon="http://i.imgur.com/auYfC7O.png"):
         if content:
             print "[>] secnotify[%s]: %s" % (title, content)
