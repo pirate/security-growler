@@ -12,7 +12,7 @@
 	<string>Nick Sweeting</string>
 	<key>BundledFiles</key>
 	<array>
-		<string>/Users/nick/Desktop/Work/Personal Projects/ssh-growler/growler.py</string>
+		<string>/Users/nick/Desktop/Work/Personal Projects/security-growler/growler.py</string>
 	</array>
 	<key>Creator</key>
 	<string>Platypus-4.8</string>
@@ -33,7 +33,7 @@
 	<key>IconPath</key>
 	<string>/tmp/PlatypusIcon.icns</string>
 	<key>Identifier</key>
-	<string>org.nick.security-growler</string>
+	<string>org.nick.SecurityGrowler</string>
 	<key>Interpreter</key>
 	<string>/bin/sh</string>
 	<key>InterpreterArgs</key>
@@ -55,7 +55,7 @@
 	<key>ScriptArgs</key>
 	<array/>
 	<key>ScriptPath</key>
-	<string>/Users/nick/Desktop/Work/Personal Projects/ssh-growler/menubar.sh</string>
+	<string>/Users/nick/Desktop/Work/Personal Projects/security-growler/menubar.sh</string>
 	<key>Secure</key>
 	<false/>
 	<key>ShowInDock</key>
