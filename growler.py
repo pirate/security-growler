@@ -35,35 +35,45 @@ polling_rate = 3
 allNotificationsList = ['secnotify', 'secalert']
 
 try:
-    from appscript import *
-    growl = app('GrowlHelperApp')
-    growl.register(as_application='Security Growler', all_notifications=allNotificationsList, default_notifications=allNotificationsList, icon_of_application='NanoStudio.app')
-    def growlnotify(content="", title="Security Notification", icon="NanoStudio.app"):
-        if content:
-            growl.notify(with_name='secnotify', title=title, description=content, application_name='Security Growler', icon_of_application=icon)
-            print "[>] secnotify[%s]: %s" % (title, content)
-
-    def growlalert(content="", title="SECURITY ALERT", icon="Network Utility.app"):
-        if content:
-            growl.notify(with_name='secalert', title=title, description=content, application_name='Security Growler', icon_of_application=icon)
-            print "[>] secalert[%s]: %s" % (title, content)
-    print "[i] Detected Growl version <= 1.3"
-
-except:
-    import gntp
-    import gntp.notifier
-    growl = gntp.notifier.GrowlNotifier(applicationName = "Security Growler", notifications = allNotificationsList, defaultNotifications = allNotificationsList)
-    growl.register()
-    def growlnotify(content="", title="Security Notification", icon="http://i.imgur.com/auYfC7O.png"):
-        if content:
-            growl.notify(noteType="secnotify", title=title, description=content, icon=icon, sticky=False, priority=1)
-            print "[>] secnotify[%s]: %s" % (title, content)
-
-    def growlalert(content="", title="SECURITY ALERT", icon="http://i.imgur.com/auYfC7O.png"):
-        if content:
-            growl.notify(noteType="secalert", title=title, description=content, icon=icon, sticky=False, priority=1)
-            print "[>] secalert[%s]: %s" % (title, content)
-    print "[i] Detected Growl version >= 2.0"
+    try:
+        from appscript import *
+        growl = app('GrowlHelperApp')
+        growl.register(as_application='Security Growler', all_notifications=allNotificationsList, default_notifications=allNotificationsList, icon_of_application='NanoStudio.app')
+        def growlnotify(content="", title="Security Notification", icon="NanoStudio.app"):
+            if content:
+                growl.notify(with_name='secnotify', title=title, description=content, application_name='Security Growler', icon_of_application=icon)
+                print "[>] secnotify[%s]: %s" % (title, content)
+    
+        def growlalert(content="", title="SECURITY ALERT", icon="Network Utility.app"):
+            if content:
+                growl.notify(with_name='secalert', title=title, description=content, application_name='Security Growler', icon_of_application=icon)
+                print "[>] secalert[%s]: %s" % (title, content)
+        print "[i] Detected Growl version <= 1.3"
+    
+    except ApplicationNotFoundError:
+        import gntp
+        import gntp.notifier
+        growl = gntp.notifier.GrowlNotifier(applicationName = "Security Growler", notifications = allNotificationsList, defaultNotifications = allNotificationsList)
+        growl.register()
+        def growlnotify(content="", title="Security Notification", icon="http://i.imgur.com/auYfC7O.png"):
+            if content:
+                growl.notify(noteType="secnotify", title=title, description=content, icon=icon, sticky=False, priority=1)
+                print "[>] secnotify[%s]: %s" % (title, content)
+    
+        def growlalert(content="", title="SECURITY ALERT", icon="http://i.imgur.com/auYfC7O.png"):
+            if content:
+                growl.notify(noteType="secalert", title=title, description=content, icon=icon, sticky=False, priority=1)
+                print "[>] secalert[%s]: %s" % (title, content)
+        print "[i] Detected Growl version >= 2.0"
+except Exception as e:
+    if str(e).find("No module named") != -1:
+        print "[!] Growl support not installed, install it using:\n       `pip install gntp`"
+        def growlnotify(content="", title="Security Notification", icon="http://i.imgur.com/auYfC7O.png"):
+            if content:
+                print "[>] secnotify[%s]: %s" % (title, content)
+        def growlalert(content="", title="SECURITY ALERT", icon="http://i.imgur.com/auYfC7O.png"):
+            if content:
+                print "[>] secalert[%s]: %s" % (title, content)
 
 def parse(line="", log_type=None):
     if log_type == "secure":
@@ -96,15 +106,17 @@ if __name__=="__main__":
     try:
         exit = 0
         first_run = True
+        counter = 0
+        last_vnc_status = ""
+
         print("[+] Starting Security Growl Notifier.")
-        print("[i] Logfiles to watch: \n       secure.log (ssh, sudo events)\n       access_log (pages served by webserver)\n       ftp.log (ftp connections)\n       lsof -i :5900 (VNC connctions)")
+        print("[i]  Sources to watch: \n       secure.log (ssh, sudo events)\n       access_log (pages served by webserver)\n       ftp.log (ftp connections)\n       lsof -i :5900 (VNC connctions)")
         growlnotify("Started Security Growler.")
      
         secure = open(r'/var/log/secure.log', 'r')
         ftp = open(r'/var/log/ftp.log', 'r')
         apache = open(r'/var/log/apache2/access_log', 'r')
-        counter = 0
-        last_vnc_status = ""
+
         while not exit:
             secure_line = secure.readline().strip()
             apache_line = apache.readline().strip()
@@ -130,7 +142,9 @@ if __name__=="__main__":
                 if vnc_status != last_vnc_status:
                     growlnotify(vnc_status, title="VNC")
                 last_vnc_status = vnc_status
-
+            elif counter > 3000:
+                counter = 0
+                #to prevent rollover (i think python protects against rollover by allocated memory but im just being safe)
             counter += 1
     
     except KeyboardInterrupt:
