@@ -6,7 +6,8 @@ It's mostly userful if you're paranoid about people trying to hack into your com
 
 ## Install:
 1. Download and run [Security Growler.app](https://github.com/nikisweeting/security-growler/raw/master/Security-Growler.app.zip)
-2. Run `sudo easy_install gntp` in Terminal to enable Growl support (otherwise events are logged silently to the menubar)
+2. Run `sudo easy_install gntp` in Terminal to enable Growl support  
+ (otherwise events are logged silently to the menubar)
 
 
 ## Information:  
