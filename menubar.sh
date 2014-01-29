@@ -9,5 +9,5 @@ then
 else
     echo "Secuirty Growler is not running. ☹"
     DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-    python "$DIR"/growler.py > /tmp/security-growler.err 2>&1 &
+    python "$DIR"/growler.py > /var/log/securitygrowler.log 2>&1 &
 fi
