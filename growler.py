@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
-# MIT Liscence
-
-# -*- coding: utf-8 -*-
-# MIT Liscence
+# MIT Liscense
 
 import os, sys, time, re
 
 ### Remove/comment this block to disable logging stdout/err to a file
-filename="/tmp/security-growler.log" 
+filename="/var/log/securitygrowlerevents.log" 
 so = se = open(filename, 'w', 0)
 # re-open stdout without buffering
 sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
@@ -160,9 +157,9 @@ if __name__=="__main__":
 # if ps ax | grep -v grep | grep $SERVICE > /dev/null
 # then
 #     echo "Secuirty Growler is running. 🍺"
-#     cat /tmp/security-growler.log
+#     cat /var/log/securitygrowler.log
 # else
 #     echo "Secuirty Growler is not running. X"
 #     DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-#     python "$DIR"/growler.py > /tmp/security-growler.err 2>&1 &
+#     python "$DIR"/growler.py > /var/log/securitygrowler.err 2>&1 &
 # fi
