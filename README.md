@@ -1,8 +1,8 @@
-**Nick Sweeting 2013 -- MIT License**  
+**Nick Sweeting 2014 -- MIT License**  
 Security Growler
 ========
 This app will notify you if any SSH, FTP, VNC, AFP, or sudo authentication events occur.  
-It's mostly userful if you're paranoid about people trying to hack into your computer.
+It's very useful if you're paranoid about people trying to hack into your computer.  Or... if you simply like having information about people using your computer's resources.  It's easily extensible in python, you can add modules that watch logfiles or processes and do whatever you want.
 
 ## Install:
 1. Download and run [Security Growler.app](https://github.com/nikisweeting/security-growler/raw/master/Security-Growler.app.zip)
@@ -18,9 +18,9 @@ This app will notify you if any SSH, FTP, VNC, AFP, or sudo authentication event
 
 
   ```
-  if apache_line:
-      apache_line = parse(line=apache_line, log_type="apache")
-      growlnotify(content=apache_line, title="Apache2 Webserver")
+  #if apache_line:
+  #    apache_line = parse(line=apache_line, log_type="apache")
+  #    growlnotify(content=apache_line, title="Apache2 Webserver")
   ```
   
 This project was started in August 2013, and is so far only being worked on by me.
