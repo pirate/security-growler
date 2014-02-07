@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
-# MIT Liscence
-
-# -*- coding: utf-8 -*-
-# MIT Liscence
+# MIT Liscense
 
 import os, sys, time, re
 
 ### Remove/comment this block to disable logging stdout/err to a file
-filename="/tmp/security-growler.log" 
+filename="/tmp/securitygrowlerevents.log" 
 so = se = open(filename, 'w', 0)
 # re-open stdout without buffering
 sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
@@ -38,13 +35,13 @@ try:
     try:
         from appscript import *
         growl = app('GrowlHelperApp')
-        growl.register(as_application='Security Growler', all_notifications=allNotificationsList, default_notifications=allNotificationsList, icon_of_application='NanoStudio.app')
-        def growlnotify(content="", title="Security Notification", icon="NanoStudio.app"):
+        growl.register(as_application='Security Growler', all_notifications=allNotificationsList, default_notifications=allNotificationsList, icon='http://i.imgur.com/auYfC7O.png"')
+        def growlnotify(content="", title="Security Notification", icon="/Applications/Utilities/Network Utility.app"):
             if content:
                 growl.notify(with_name='secnotify', title=title, description=content, application_name='Security Growler', icon_of_application=icon)
                 print "[>] secnotify[%s]: %s" % (title, content)
     
-        def growlalert(content="", title="SECURITY ALERT", icon="Network Utility.app"):
+        def growlalert(content="", title="SECURITY ALERT", icon="/Applications/Utilities/Network Utility.app"):
             if content:
                 growl.notify(with_name='secalert', title=title, description=content, application_name='Security Growler', icon_of_application=icon)
                 print "[>] secalert[%s]: %s" % (title, content)
@@ -68,10 +65,10 @@ try:
 except Exception as e:
     print "[X] Error initializing: %s" % e
     print "[!] Growl support not installed, install it using:\n       `easy_install install gntp`      for Growl version >=2.0\n       `easy_install install appscript` for Growl version <=1.3"
-    def growlnotify(content="", title="Security Notification", icon="http://i.imgur.com/auYfC7O.png"):
+    def growlnotify(content="", title="Security Notification"):
         if content:
             print "[>] secnotify[%s]: %s" % (title, content)
-    def growlalert(content="", title="SECURITY ALERT", icon="http://i.imgur.com/auYfC7O.png"):
+    def growlalert(content="", title="SECURITY ALERT", ):
         if content:
             print "[>] secalert[%s]: %s" % (title, content)
 
@@ -152,17 +149,3 @@ if __name__=="__main__":
     except Exception as e:
         print("[X] EXIT: %s" % e)
     raise SystemExit(0)
-
-# #!/bin/sh
-#
-# SERVICE="growler.py"
-#
-# if ps ax | grep -v grep | grep $SERVICE > /dev/null
-# then
-#     echo "Secuirty Growler is running. 🍺"
-#     cat /tmp/security-growler.log
-# else
-#     echo "Secuirty Growler is not running. X"
-#     DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-#     python "$DIR"/growler.py > /tmp/security-growler.err 2>&1 &
-# fi

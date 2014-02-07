@@ -33,7 +33,7 @@
 	<key>IconPath</key>
 	<string>/tmp/PlatypusIcon.icns</string>
 	<key>Identifier</key>
-	<string>org.nick.SecurityGrowler</string>
+	<string>org.nikisweeting.SecurityGrowler</string>
 	<key>Interpreter</key>
 	<string>/bin/sh</string>
 	<key>InterpreterArgs</key>
