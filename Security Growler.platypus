@@ -33,7 +33,7 @@
 	<key>IconPath</key>
 	<string>/tmp/PlatypusIcon.icns</string>
 	<key>Identifier</key>
-	<string>org.nikisweeting.SecurityGrowler</string>
+	<string>org.nick.SecurityGrowler</string>
 	<key>Interpreter</key>
 	<string>/bin/sh</string>
 	<key>InterpreterArgs</key>
@@ -242,6 +242,6 @@
 	<key>UseXMLPlistFormat</key>
 	<true/>
 	<key>Version</key>
-	<string>1.0</string>
+	<string>1.2</string>
 </dict>
 </plist>
