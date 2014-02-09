@@ -10,9 +10,15 @@ This menubar app for OS X will notify you via Growl or Notifcation Center if any
 
 ## Information:  
   
-I was tired of not being able to find an app that would quell my paranoia about open ports, so I made one myself.  Now I can relax whenever I'm in a seedy internet cafe or connected to free Boingo airport wifi because I know if anyone is trying to connect to my computer.
+I was tired of not being able to find an app that would quell my paranoia about open ports, so I made one myself. Now I can relax whenever I'm in a seedy internet cafe or connected to free Boingo airport wifi because I know if anyone is trying to connect to my computer.
 
-This app will notify you if any SSH, FTP, VNC, AFP, or sudo authentication events occur.  It also notifies you whenever a page an apache error occurs (although you may want to turn this off if you develop locally, getting growl bubbles on every pageload is annoying).  Simply comment out these three lines in `Security Growler.app/Contents/Resources/growler.py` to do so:  
+This app will notify you if any SSH, FTP, VNC, AFP, or Sudo auth events occur. 
+
+It does **not** increase your security in any way, it just notifies you **who** and **when** people are authenticated on your computer. It also notifies you whenever an apache error occurs (although you may want to turn this off if you develop locally, getting growl bubbles on every pageload is annoying).
+
+## To disable apache error notifications:
+
+Simply comment out these three lines in `Security Growler.app/Contents/Resources/growler.py`  
 
 
   ```
@@ -21,5 +27,6 @@ This app will notify you if any SSH, FTP, VNC, AFP, or sudo authentication event
   #    notify(content=apache_line, title=apache_event)
   ```
   
+A related project is available for Linux users: [PushAlotAuth](https://github.com/benjojo/PushAlotAuth), it uses the PushALot push-notification platform.
 ====
 **Nick Sweeting 2014 -- MIT License**  
