@@ -52,14 +52,14 @@
 
 <p>I was tired of not being able to find an app that would quell my paranoia about open ports, so I made one myself.  Now I can relax whenever I'm in a seedy internet cafe or connected to free Boingo airport wifi because I know if anyone is trying to connect to my computer.</p>
 
-<p>This app will notify you if any SSH, FTP, VNC, AFP, or sudo authentication events occur.  It also notifies you whenever a page an apache error occurs (although you may want to turn this off if you develop locally, getting growl bubbles on every pageload is annoying).  Simply comment out these three lines in <code>Security Growler.app/Contents/Resources/growler.py</code> to do so:  </p>
+<p>This app will notify you if any SSH, FTP, VNC, AFP, or sudo authentication events occur.  It does <b>not</b> increase your security in any way, it just notifies you <b>who</b> and <b>when</b> people are authenticated on your computer.  It also notifies you whenever an apache error occurs (although you may want to turn this off if you develop locally, getting growl bubbles on every pageload is annoying).  Simply comment out these three lines in <code>Security Growler.app/Contents/Resources/growler.py</code> to do so:  </p>
 
 <pre><code>  #if apache_event:
   #    print("[&gt;] secnotify[%s]: %s" % (apache_event, apache_line))
   #    notify(content=apache_line, title=apache_event)
 </code></pre>
 
-<h1></h1>
+<p>A sister project is available for Linux users: <a href="https://github.com/benjojo/PushAlotAuth">PushAlotAuth</a>, it uses the PushALot push-notification platform.</p>
 
 <p><strong><a href="http://nicksweeting.com">nicksweeting.com</a> 2014 -- MIT License</strong>  </p>
       </section>
