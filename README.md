@@ -26,7 +26,8 @@ Simply comment out these three lines in `Security Growler.app/Contents/Resources
   #    print("[>] secnotify[%s]: %s" % (apache_event, apache_line))
   #    notify(content=apache_line, title=apache_event)
   ```
-  
+
 A related project is available for Linux users: [PushAlotAuth](https://github.com/benjojo/PushAlotAuth), it uses the PushALot push-notification platform.
+
 ====
 **Nick Sweeting 2014 -- MIT License**  
