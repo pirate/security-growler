@@ -5,15 +5,15 @@
 
 import os, sys, time, re, itertools
 
-### Comment out this block to disable logging stdout/err to a file. 
+### Comment out this block to disable logging stdout/err to a file.
 # The menubar app simply reads this logfile and outputs its contents, so you remove this code the menubar will break (because it expects /tmp/securitygrowlerevents.log).
 filename="/tmp/securitygrowlerevents.log"
 so = se = open(filename, 'w', 0)
 # re-open stdout without buffering
 sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
 # redirect stdout (print) and stderr to the log file
-os.dup2(so.fileno(), sys.stdout.fileno())
-os.dup2(se.fileno(), sys.stderr.fileno())
+#os.dup2(so.fileno(), sys.stdout.fileno())
+#os.dup2(se.fileno(), sys.stderr.fileno())
 ### Endblock
 
 polling_rate = 3    # number of seconds to wait between re-checking logfiles, increase this number for lower cpu use but slower notifications
@@ -100,8 +100,8 @@ except Exception as e1:
         except Exception as e3:
             # Fall back to silent logging, no notifications
             print "[X] No available notifcation medium availabe:"
-            print "    tried OSX Notification Center: %s" % e1
-            print "    tried Growl version >2.0: %s" % e2
+            print "    tried Growl version >2.0: %s" % e1
+            print "    tried OSX Notification Center: %s" % e2
             print "    tried Growl version >1.3: %s" % e3
             print "[!] Growl and/or Growl-python support not installed, and OS X notifications not available (OS X >10.8 only)."
             print "[i] If you want to use Growl, run:\n       `easy_install install gntp`      for Growl version >=2.0\n       `easy_install install appscript` for Growl version <=1.3"
@@ -139,16 +139,22 @@ if __name__=="__main__":
         notify("Started Security Growler.")
         print("[i]  Watched sources: \n       secure.log (ssh, sudo events)\n       access_log (pages served by webserver)\n       ftp.log (ftp connections)\n       lsof -i :5900 (VNC connctions)")
 
-        secure_log = open(r'/var/log/secure.log', 'r')
-        apache_log = open(r'/var/log/apache2/error_log', 'r')
-        ftp_log = open(r'/var/log/ftp.log', 'r')
+        try:
+            secure_log = open(r'/var/log/secure.log', 'r')
+        except IOError:
+            secure_log = open(r'/var/log/system.log', 'r')
+        try:
+            ftp_log = open(r'/var/log/ftp.log', 'r')
+        except IOError:
+            ftp_log = open(r'/dev/null', 'r')
+        try:
+            apache_log = open(r'/var/log/apache2/error_log', 'r')
+        except IOError:
+            apache_log = open(r'/dev/null', 'r')
 
-        while secure_log.readline().strip():
-            pass
-        while apache_log.readline().strip():
-            pass
-        while ftp_log.readline().strip():
-            pass
+        while secure_log.readline().strip(): pass
+        while apache_log.readline().strip(): pass
+        while ftp_log.readline().strip(): pass
 
         last_vnc_status = ""
         for counter in itertools.cycle([1,2,3]):
