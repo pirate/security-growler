@@ -3,20 +3,18 @@
 # Nick Sweeting (nikisweeting) 2014
 # MIT Liscense
 
-import os, sys, time, re, itertools
+import os, sys, time, re, itertools, logging
+logging.basicConfig(filename='/tmp/securitygrowler-errors.log', level=logging.ERROR)
 
-log_to_file = False
+polling_rate = 3    # number of seconds to wait between re-checking logfiles, increase this number for lower cpu use but slower notifications
 
-if log_to_file:
-    #The menubar app simply reads this logfile and outputs its contents, so you remove this code the menubar will break (because it expects /tmp/securitygrowlerevents.log).
-    filename="/tmp/securitygrowlerevents.log"
-    so = se = open(filename, 'w', 0)
-    sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
-    #redirect stdout (print) and stderr to the log file
-    os.dup2(so.fileno(), sys.stdout.fileno())
-    os.dup2(se.fileno(), sys.stderr.fileno())
+def log(text, location="/tmp/securitygrowler-events.log"):
+    if log_to_file:
+        with open(location, 'a') as so:
+            so.write(text+"\n")
+    else:
+        print(text)
 
-polling_rate = 2    # number of seconds to wait between re-checking logfiles, increase this number for lower cpu use but slower notifications
 notification_types = ['secnotify', 'secalert']
 
 # tries growl v2
@@ -27,7 +25,7 @@ notification_types = ['secnotify', 'secalert']
 #       if no growl:
 #           fallback to silent logging
 
-def get_notifiers(use_type="Growl 2"):
+def get_notifiers():
     try:
         # Try to use Growl version >= 2.0 for notifications
         import gntp, gntp.notifier
@@ -35,16 +33,16 @@ def get_notifiers(use_type="Growl 2"):
         if not growl.register():
             raise Exception("No Growl >2.0v found.")
 
-        def notify(content="", title="Security Notification", icon='http://i.imgur.com/auYfC7O.png', sound=False):
+        def notify(content="", title="Security Notification", icon='http://i.imgur.com/auYfC7O.png'):
             if content:
                 growl.notify(noteType="secnotify", title=title, description=content, icon=icon, sticky=False, priority=1)
-                print "[>] secnotify[%s]: %s" % (title, content)
-        def alert(content="", title="SECURITY ALERT", icon='http://i.imgur.com/auYfC7O.png', sound=False):
+                log("[>] secnotify[%s]: %s" % (title, content))
+        def alert(content="", title="SECURITY ALERT", icon='http://i.imgur.com/auYfC7O.png'):
             if content:
                 growl.notify(noteType="secalert", title=title, description=content, icon=icon, sticky=False, priority=2)
-                print "[>] secalert[%s]: %s" % (title, content)
+                log("[>] secalert[%s]: %s" % (title, content))
 
-        print "[√] Using Growl version >= 2.0"
+        log("[√] Using Growl version >= 2.0")
         notify(content="Using Growl for security notifications.", title="Security-Growler")
 
         return notify, alert
@@ -52,31 +50,27 @@ def get_notifiers(use_type="Growl 2"):
     except Exception as e1:
         try:
             # Try OS X Notification Center
-            from Foundation import NSUserNotification, NSUserNotificationCenter, NSUserNotificationDefaultSoundName
+            from Foundation import NSUserNotification, NSUserNotificationCenter
 
             def notify(content="", title="Security Notification", icon=None, sound=None):
                 if content:
-                    print "[>] secnotify[%s]: %s" % (title, content)
+                    log("[>] secnotify[%s]: %s" % (title, content))
                     notification = NSUserNotification.alloc().init()
                     notification.setTitle_(title)
                     notification.setInformativeText_(content)
-                    if sound:
-                        notification.setSoundName_(NSUserNotificationDefaultSoundName)
                     center = NSUserNotificationCenter.defaultUserNotificationCenter()
                     center.deliverNotification_(notification)
             def alert(content="", title="SECURITY ALERT", icon=None, sound=None):
                 if content:
-                    print "[>] secalert[%s]: %s" % (title, content)
+                    log("[>] secalert[%s]: %s" % (title, content))
                     notification = NSUserNotification.alloc().init()
                     notification.setTitle_(title)
                     notification.setInformativeText_(content)
-                    if sound:
-                        notification.setSoundName_(NSUserNotificationDefaultSoundName)
                     center = NSUserNotificationCenter.defaultUserNotificationCenter()
                     center.deliverNotification_(notification)
 
-            print "[√] Using OS X Notification Center (growl not installed)"
-            print "[i] If you prefer Growl, install python-growl by running:\n       `easy_install install gntp`      for Growl version >=2.0\n       `easy_install install appscript` for Growl version <=1.3"
+            log("[√] Using OS X Notification Center (growl not installed: %s)" % e1)
+            log("[i] If you prefer Growl, install python-growl by running:\n       `easy_install install gntp`      for Growl version >=2.0\n       `easy_install install appscript` for Growl version <=1.3")
             notify(content="Using OS X Notifcation Center for security notifications.", title="Security-Growler")
 
             return notify, alert
@@ -89,38 +83,38 @@ def get_notifiers(use_type="Growl 2"):
                 growl = app('GrowlHelperApp')
                 growl.register(as_application='Security Growler', all_notifications=notification_types, default_notifications=notification_types, icon_of_application='/Applications/Utilities/Network Utility.app"')
 
-                def notify(content="", title="Security Notification", icon=False, sound=False):
+                def notify(content="", title="Security Notification", icon=False):
                     if content:
                         if icon:
                             growl.notify(with_name='secnotify', title=title, description=content, application_name='Security Growler', image_from_location=icon)
                         else:
                             growl.notify(with_name='secnotify', title=title, description=content, application_name='Security Growler', icon_of_application="/Applications/Utilities/Network Utility.app")
-                        print "[>] secnotify[%s]: %s" % (title, content)
-                def alert(content="", title="SECURITY ALERT", icon=False, sound=False):
+                        log("[>] secnotify[%s]: %s" % (title, content))
+                def alert(content="", title="SECURITY ALERT", icon=False):
                     if content:
                         if icon:
                             growl.notify(with_name='secalert', title=title, description=content, application_name='Security Growler', image_from_location=icon)
                         else:
                             growl.notify(with_name='secalert', title=title, description=content, application_name='Security Growler', icon_of_application="/Applications/Utilities/Network Utility.app")
-                        print "[>] secalert[%s]: %s" % (title, content)
+                        log("[>] secalert[%s]: %s" % (title, content))
 
-                print "[√] Detected Growl version <= 1.3"
+                log("[√] Detected Growl version <= 1.3")
                 notify(content="Using legacy growl.", title="Security-Growler")
 
                 return notify, alert
 
             except Exception as e3:
                 # Fall back to silent logging, no notifications
-                print "[X] No available notifcation medium availabe:"
-                print "    tried Growl version >2.0: %s" % e1
-                print "    tried OSX Notification Center: %s" % e2
-                print "    tried Growl version >1.3: %s" % e3
-                print "[!] Growl and/or Growl-python support not installed, and OS X notifications not available (OS X >10.8 only)."
-                print "[i] If you want to use Growl, run:\n       `easy_install install gntp`      for Growl version >=2.0\n       `easy_install install appscript` for Growl version <=1.3"
+                log("[X] No available notifcation medium availabe:")
+                log("    tried Growl version >2.0: %s" % e1)
+                log("    tried OSX Notification Center: %s" % e2)
+                log("    tried Growl version >1.3: %s" % e3)
+                log("[!] Growl and/or Growl-python support not installed, and OS X notifications not available (OS X >10.8 only).")
+                log("[i] If you want to use Growl, run:\n       `easy_install install gntp`      for Growl version >=2.0\n       `easy_install install appscript` for Growl version <=1.3")
 
-                def notify(content="", title="Security Notification", icon=False, sound=False):
+                def notify(content="", title="Security Notification", icon=False):
                     pass
-                def alert(content="", title="SECURITY ALERT", icon=False, sound=False):
+                def alert(content="", title="SECURITY ALERT", icon=False):
                     pass
 
                 return notify, alert
@@ -150,11 +144,10 @@ def parse(line="", log_type=None):
 
 dead_log = open(r'/dev/null', 'r')
 
-
 def main():
     notify, alert = get_notifiers()
     notify("Started Security Growler.")
-    print("[i]  Watched sources: \n       secure.log (ssh, sudo events)\n       access_log (pages served by webserver)\n       ftp.log (ftp connections)\n       lsof -i :5900 (VNC connctions)")
+    log("[i]  Watched sources: \n       secure.log (ssh, sudo events)\n       access_log (pages served by webserver)\n       ftp.log (ftp connections)\n       lsof -i :5900 (VNC connctions)")
 
 
     if os.path.isfile('/var/log/secure.log'):
@@ -181,7 +174,7 @@ def main():
             # for cpu intensive tasks, only run checks every third time we check logfiles
             vnc_status = os.popen("lsof -i :5900 | tail -n +2").read().strip()
             if vnc_status != last_vnc_status:
-                print("[>] secalert[VNC]: " + vnc_status)
+                log("[>] secalert[VNC]: " + vnc_status)
                 notify(vnc_status, title="VNC")
             last_vnc_status = vnc_status
 
@@ -189,26 +182,27 @@ def main():
             time.sleep(polling_rate)
         else:
             if secure_event:
-                print("[>] secnotify[%s]: %s" % (secure_event, secure_line))
+                log("[>] secnotify[%s]: %s" % (secure_event, secure_line))
                 notify(content=secure_line, title=secure_event)
             ### Comment these 2 lines out to disable apache error notifications {
             if apache_event:
-                print("[>] secnotify[%s]: %s" % (apache_event, apache_line))
+                log("[>] secnotify[%s]: %s" % (apache_event, apache_line))
                 notify(content=apache_line, title=apache_event)
             ### }
             if ftp_event:
-                print("[>] secnotify[%s]: %s" % (ftp_event, ftp_line))
+                log("[>] secnotify[%s]: %s" % (ftp_event, ftp_line))
                 notify(ftp_line, title=ftp_event)
 
 if __name__ == "__main__":
-    # try
-    main()
-    # except Exception as e:
-    #     # generally not advised to catch all exceptions, however it is done here to write the exception to the logfile so that app doesnt fail silently
-    #     # the logfile is displayed by the menubar, where the user will be able to see the [X] EXIT line showing that the secnotify failed and how it failed
-    #     alert(content=e, title="SECURITY GROWLER STOPPED")
-    #     print("[X] EXIT: %s" % e)
-    #     raise e
+    log_to_file = True
+    try:
+        main()
+    except Exception as e:
+        # generally not advised to catch all exceptions, however it is done here to write the exception to the logfile so that app doesnt fail silently
+        # the logfile is displayed by the menubar, where the user will be able to see the [X] EXIT line showing that the secnotify failed and how it failed
+        alert(content=e, title="SECURITY GROWLER STOPPED")
+        log("[X] EXIT: %s" % e)
+        raise e
 
 # TODO: add more logs to watch:
 # diff:secure.log: SSH, AFP, VNC, others

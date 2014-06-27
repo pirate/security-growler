@@ -38,13 +38,13 @@
 	<key>IconPath</key>
 	<string>/tmp/PlatypusIcon.icns</string>
 	<key>Identifier</key>
-	<string>pirate.github.SecurityGrowler</string>
+	<string>pirate.github.SecurityGrowler-dev</string>
 	<key>Interpreter</key>
 	<string>/bin/sh</string>
 	<key>InterpreterArgs</key>
 	<array/>
 	<key>Name</key>
-	<string>Security Growler</string>
+	<string>Security Growler-dev</string>
 	<key>NibPath</key>
 	<string>/usr/local/share/platypus/MainMenu.nib</string>
 	<key>OptimizeApplication</key>
@@ -245,6 +245,6 @@
 	<key>UseXMLPlistFormat</key>
 	<true/>
 	<key>Version</key>
-	<string>1.4</string>
+	<string>1.4b</string>
 </dict>
 </plist>
