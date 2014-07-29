@@ -21,13 +21,21 @@ It does **not** increase your security in any way, it just notifies you **who** 
 Simply comment out these three lines in `Security Growler.app/Contents/Resources/growler.py`  
 
 
-  ```
-  #if apache_event:
-  #    print("[>] secnotify[%s]: %s" % (apache_event, apache_line))
-  #    notify(content=apache_line, title=apache_event)
+  ```python
+  if apache_event:
+      print("[>] secnotify[%s]: %s" % (apache_event, apache_line))
+      notify(content=apache_line, title=apache_event)
   ```
 
 A related project is available for Linux users: [PushAlotAuth](https://github.com/benjojo/PushAlotAuth), it uses the PushALot push-notification platform.
+
+## Developer Info:
+
+The menubar app is a simple wrapper for the python script, compiled using [Platypus](http://www.macupdate.com/app/mac/12046/platypus).  `Security Growler-dev.app` is symlinked to run `growler.py` for development.  `Security Growler.app` is packaged and uses it's prebuilt `growler.py`.  To make changes to the app, change `menubar.sh`, and `growler.py`, and run `Security Growler-dev.app` to test your changes.  Once you're done, submit a pull request.   
+  
+The menubar app works by simply running `growler.py` (which writes to a log file), then `cat`ing the contents of `/tmp/securitygrowlerevents.log` and displaying them in the dropdown.  See `menubar.sh` for more details.
+
+
 
 ====
 **Nick Sweeting 2014 -- MIT License**  
