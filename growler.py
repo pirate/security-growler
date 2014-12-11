@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# Nick Sweeting (nikisweeting) 2014
+# Nick Sweeting (github.com/pirate) 2014
 # MIT Liscense
 
 import os, sys, time, re, itertools, logging
@@ -42,8 +42,7 @@ def get_notifiers():
                 growl.notify(noteType="secalert", title=title, description=content, icon=icon, sticky=False, priority=2)
                 log("[>] secalert[%s]: %s" % (title, content))
 
-        log("[√] Using Growl version >= 2.0")
-        notify(content="Using Growl for security notifications.", title="Security-Growler")
+        # log("[√] Using Growl version >= 2.0")
 
         return notify, alert
 
@@ -69,9 +68,7 @@ def get_notifiers():
                     center = NSUserNotificationCenter.defaultUserNotificationCenter()
                     center.deliverNotification_(notification)
 
-            log("[√] Using OS X Notification Center (growl not installed: %s)" % e1)
-            log("[i] If you prefer Growl, install python-growl by running:\n       `easy_install install gntp`      for Growl version >=2.0\n       `easy_install install appscript` for Growl version <=1.3")
-            notify(content="Using OS X Notifcation Center for security notifications.", title="Security-Growler")
+            # log("[i] If you prefer Growl, install python-growl by running:\n       `easy_install install gntp`      for Growl version >=2.0\n       `easy_install install appscript` for Growl version <=1.3")
 
             return notify, alert
 
@@ -99,7 +96,6 @@ def get_notifiers():
                         log("[>] secalert[%s]: %s" % (title, content))
 
                 log("[√] Detected Growl version <= 1.3")
-                notify(content="Using legacy growl.", title="Security-Growler")
 
                 return notify, alert
 
@@ -120,7 +116,7 @@ def get_notifiers():
                 return notify, alert
 
 def parse(line="", log_type=None):
-    # return tuple of event name and details ("event", "line") or ("", "") if nothing parsed
+    """return tuple of event name and details ("ssh login", "accepted pk from...") or ("", "") if nothing parsed"""
     if not line.strip():
         return ("","")
     if log_type == "secure":
@@ -160,6 +156,7 @@ def main():
     ftp_log = open(r'/var/log/ftp.log', 'r') if os.path.isfile('/var/log/ftp.log') else dead_log
     apache_log = open(r'/var/log/apache2/error_log', 'r') if os.path.isfile('/var/log/ftp.log') else dead_log
 
+    # catch up to most recent line
     while secure_log.readline().strip(): pass
     while apache_log.readline().strip(): pass
     while ftp_log.readline().strip(): pass
