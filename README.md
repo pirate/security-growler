@@ -1,11 +1,15 @@
-[Security Growler](http://nikisweeting.github.io/security-growler)
+[Security Growler](http://pirate.github.io/security-growler)
 ========
 This menubar app for OS X will notify you via Growl or Notifcation Center if any SSH, FTP, VNC, AFP, or Sudo authentication events occur.  It's very useful if you're paranoid about people trying to hack into your computer.  Or... if you simply like having information about people using your computer's resources.  It's easily extensible in python, you can add modules that watch logfiles or processes and do whatever you want.  You can even send them as push notiifcations to your iOS device using [Prowl](http://prowlapp.com/).
 
 ## Install:
 1. Download and run [Security Growler.app](https://github.com/nikisweeting/security-growler/raw/master/Security-Growler.app.zip)
-2. Run `sudo easy_install gntp` in Terminal to enable Growl support  
- (otherwise it defaults to using Notification Center)
+2. Click on the menubar icon once to start logging events  
+
+Optionally, run `sudo easy_install gntp` in Terminal to enable Growl support (otherwise it defaults to using Notification Center).  
+  
+![](http://pirate.github.io/security-growler/screenshot2.png)  
+![](http://pirate.github.io/security-growler/screenshot1.png)  
 
 
 ## Information:  
@@ -38,4 +42,13 @@ The menubar app works by simply running `growler.py` (which writes to a log file
 
 
 ====
-**Nick Sweeting 2014 -- MIT License**  
+**Nick Sweeting 2015**  
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, pulverize, distribute, synergize, compost, defenestrate, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+If the Author of the Software (the "Author") needs a place to crash and you have a sofa available, you should maybe give the Author a break and let him sleep on your couch.
+
+If you are caught in a dire situation wherein you only have enough time to save one person out of a group, and the Author is a member of that group, you must save the Author.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO BLAH BLAH BLAH ISN'T IT FUNNY HOW UPPER-CASE MAKES IT SOUND LIKE THE LICENSE IS ANGRY AND SHOUTING AT YOU.
