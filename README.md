@@ -10,7 +10,7 @@ This menubar app for OS X will notify you via Growl or Notifcation Center if any
 
 Optionally, run `sudo easy_install gntp` in Terminal to enable Growl support (otherwise it defaults to using OS X Notification Center).
 
-<img src="http://pirate.github.io/security-growler/screenshots/menubar_1.PNG" width="40%"/>
+<img src="http://pirate.github.io/security-growler/screenshots/menubar_1.PNG" width="40%" vertical-align="top"/>
 <img src="http://pirate.github.io/security-growler/screenshots/menubar_2.PNG" width="40%"/>
 
 
@@ -18,25 +18,26 @@ Optionally, run `sudo easy_install gntp` in Terminal to enable Growl support (ot
 
 **Alert you to attempted and succesfull SSH logins:**
 
-![](http://pirate.github.io/security-growler/screenshots/ssh_fail_event.PNG)
-![](http://pirate.github.io/security-growler/screenshots/ssh_key_event.PNG)
+<img src="http://pirate.github.io/security-growler/screenshots/ssh_fail_event.PNG" width="40%"/>
+<img src="http://pirate.github.io/security-growler/screenshots/ssh_key_event.PNG" width="40%"/>
 
 **Notify you of arbitrary TCP connections: VNC, PostgreSQL, even plain HTTP:**
 
-![](http://pirate.github.io/security-growler/screenshots/vnc_event.PNG)
-![](http://pirate.github.io/security-growler/screenshots/connection_event.PNG)
+<img src="http://pirate.github.io/security-growler/screenshots/vnc_event.PNG" width="40%"/>
+<img src="http://pirate.github.io/security-growler/screenshots/connection_event.PNG" width="40%"/>
 
 **Notify you whenever a command is run with sudo:**
 
-![](http://pirate.github.io/security-growler/screenshots/sudo_event.PNG)
-![](http://pirate.github.io/security-growler/screenshots/sudo_context.PNG)
+<!-- ![](http://pirate.github.io/security-growler/screenshots/sudo_event.PNG) -->
+<img src="http://pirate.github.io/security-growler/screenshots/sudo_context.PNG" height="400px"/>
 
 **Let you know when you're being portscanned:**
 
-![](http://pirate.github.io/security-growler/screenshots/portscan_event.PNG)
-![](http://pirate.github.io/security-growler/screenshots/portscan_context.PNG)
+<img src="http://pirate.github.io/security-growler/screenshots/portscan_context.PNG" height="400px"/>
 
-![](http://pirate.github.io/security-growler/screenshots/menubar_3.PNG)
+<img src="http://pirate.github.io/security-growler/screenshots/menubar_3.PNG" height="400px"/>
+
+[More Screenshots...](https://github.com/pirate/security-growler/tree/gh-pages/screenshots)
 
 ----
 
