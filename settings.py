@@ -11,6 +11,7 @@ WATCHED_SOURCES = {
     445: 'connections',     # SMB
     585: 'connections',     # AFP
     3689: 'connections',    # iTunes sharing
+    3306: 'connections',    # MySQL
     5432: 'connections',    # PostgreSQL
     5900: 'vnc',            # VNC
     '/var/log/system.log': ('sudo', 'ssh', 'portscan'),
