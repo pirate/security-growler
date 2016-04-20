@@ -23,7 +23,7 @@ If you prefer [Growl](http://growl.info) to the OS X Notification Center, run `s
 
 ## It can do cool things like:
 
-**Alert you to attempted and succesfull SSH logins:**
+**Alert you of attempted and succesfull SSH logins:**
 
 <img src="http://pirate.github.io/security-growler/screenshots/ssh_fail_event.PNG" width="40%"/>
 <img src="http://pirate.github.io/security-growler/screenshots/ssh_key_event.PNG" width="40%"/>
@@ -35,7 +35,6 @@ If you prefer [Growl](http://growl.info) to the OS X Notification Center, run `s
 
 **Notify you whenever a command is run with `sudo`:**
 
-<!-- ![](http://pirate.github.io/security-growler/screenshots/sudo_event.PNG) -->
 <img src="http://pirate.github.io/security-growler/screenshots/sudo_context.PNG" height="350px"/>
 
 **Let you know when you're being portscanned:**
