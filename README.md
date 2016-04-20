@@ -14,10 +14,10 @@ It's easily extensible in python, you can add modules that watch ports for conne
 1. Download and run [Security Growler.app](https://github.com/nikisweeting/security-growler/raw/master/Security-Growler.app.zip)
 2. Click on the menubar icon once to start detecting events.
 
-Optionally, run `sudo easy_install gntp` in Terminal to enable [Growl](http://growl.info) support (otherwise it defaults to using OS X Notification Center).
+If you prefer [Growl](http://growl.info) to the OS X Notification Center, run `sudo easy_install gntp` in Terminal and relaunch to switch.
 
 <img src="http://pirate.github.io/security-growler/screenshots/menubar_2.PNG" width="45%"/>
-<img src="http://pirate.github.io/security-growler/screenshots/menubar_1.PNG" width="45%"/><br/><br/>
+<img src="http://pirate.github.io/security-growler/screenshots/menubar_1.PNG" width="45%"/>
 
 ## It can do cool things like:
 
