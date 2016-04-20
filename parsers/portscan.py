@@ -7,5 +7,5 @@ def parse(line, source=None):
     if PORTSCAN_EVENT_FILTER.findall(line):
         return ('alert',
             'Incoming Portscan Detected',
-            line.split('port RST response ', 1)[-1])
+            'Limiting ' + line.split('port RST response ', 1)[-1])
     return (None, '', '')
