@@ -108,7 +108,7 @@ Change the `INFO_` and `ALERT_` items to modify properties such as alert sounds,
 This app is composed of 3 main parts: `sources`, `parsers`, and `loggers`.
 
  * [`sources`](https://github.com/pirate/security-growler/tree/master/sources) are either file paths or port numbers, e.g. `/var/log/system.log` or `5900`
- * [`parsers`](https://github.com/pirate/security-growler/tree/master/parsers) take the text from the `sources`, and parse out various alerts, e.g. `ssh` or `sudo`
+ * [`parsers`](https://github.com/pirate/security-growler/tree/master/parsers) e.g. `ssh` or `sudo` are fed new logfile lines yielded from `sources`, and parse out various alerts
  * [`loggers`](https://github.com/pirate/security-growler/tree/master/loggers) are output channels for alerts, e.g. `stdout`, `osxnotifications`, or `growl`
 
 The main runloop is in [`growler.py`](https://github.com/pirate/security-growler/blob/master/growler.py), it reads lines out of the sources, passes them through parsers, then dispatches alerts before waiting a short delay and then looping.
