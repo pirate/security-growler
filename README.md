@@ -15,7 +15,7 @@ Optionally, run `sudo easy_install gntp` in Terminal to enable Growl support (ot
 
 **Let you know when you're being portscanned:**
 
-![](http://pirate.github.io/security-growler/screenshots/portscan_context.PNG)
+<!-- ![](http://pirate.github.io/security-growler/screenshots/portscan_context.PNG) -->
 ![](http://pirate.github.io/security-growler/screenshots/portscan_event.PNG)
 
 **Alert you to attempted and succesfull SSH logins:**
@@ -25,7 +25,7 @@ Optionally, run `sudo easy_install gntp` in Terminal to enable Growl support (ot
 
 **Notify you whenever a command is run with sudo:**
 
-![](http://pirate.github.io/security-growler/screenshots/sudo_context.PNG)
+<!-- ![](http://pirate.github.io/security-growler/screenshots/sudo_context.PNG) -->
 ![](http://pirate.github.io/security-growler/screenshots/sudo_event.PNG)
 
 **Notify you of arbitrary TCP connections: VNC, PostgreSQL, even plain HTTP:**
