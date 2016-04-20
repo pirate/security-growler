@@ -32,14 +32,14 @@ EVENT_LOGFILE = expanduser('~/SecurityGrowler.log')
 
 # Growl/OSX notification display settings
 INFO_TYPE = 'secnotify'
-INFO_ICON = 'http://i.imgur.com/auYfC7O.png'
+INFO_ICON = 'https://pirate.github.io/security-growler/notify.png'
 INFO_TITLE = 'Security Info'
 INFO_STICKY = False
 INFO_PRIORITY = 1
 INFO_SOUND = False
 
 ALERT_TYPE = 'secalert'
-ALERT_ICON = 'http://i.imgur.com/auYfC7O.png'
+ALERT_ICON = 'https://pirate.github.io/security-growler/alert.png'
 ALERT_TITLE = 'Security ALERT'
 ALERT_STICKY = True
 ALERT_PRIORITY = 2
