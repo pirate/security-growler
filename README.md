@@ -1,7 +1,4 @@
-# [Security Growler](https://pirate.github.io/security-growler)
-
-[![Twitter URL](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)]
-[![Build Status](https://img.shields.io/github/stars/pirate/security-growler.svg)](https://github.com/pirate/security-growler)
+# [Security Growler](https://pirate.github.io/security-growler)  [![Twitter URL](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/thesquashSH) [![Build Status](https://img.shields.io/github/stars/pirate/security-growler.svg)](https://github.com/pirate/security-growler)
 
 <img src="http://pirate.github.io/security-growler/screenshots/portscan_event.PNG" width="45%"/>
 <img src="http://pirate.github.io/security-growler/screenshots/vnc_event.PNG" width="45%"/>
