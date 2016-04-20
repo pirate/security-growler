@@ -1,14 +1,26 @@
-#!/bin/sh
+#!/bin/bash
 
-SERVICE="growler.py"
+SERVICE=growler.py
+OUTFILE=~/SecurityGrowler.log
 
 if ps ax | grep -v grep | grep $SERVICE > /dev/null
 then
-    echo "Security Growler is running. 🍺"
-    cat /tmp/securitygrowler-events.log
+    # Growler is already running, display its output
+    echo "🍺 Security Growler is running."
+    echo "======================================="
+    tail -50 $OUTFILE
+    echo "======================================="
+    echo "View the full log at $OUTFILE"
 else
-    echo "Security Growler is not running. ☹"
     DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-    rm /tmp/securitygrowler*
-    python "$DIR"/growler.py > /tmp/securitygrowler-sh.log 2>&1 &
+    rm $OUTFILE
+    echo "               🍺      Starting...      🍺"
+    echo ""
+    echo " information:  pirate.github.io/security-growler"
+    echo " support:      github.com/pirate/security-growler/issues"
+    echo " my website:   nicksweeting.com"
+    # echo " twitter:      @thesquashSH"
+
+    # run Growler in the background and save its output to OUTFILE
+    python "$DIR"/"$SERVICE" 2>&1>> $OUTFILE &
 fi
