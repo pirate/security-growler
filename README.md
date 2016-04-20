@@ -1,10 +1,10 @@
 [Security Growler](http://pirate.github.io/security-growler)
 ========
 
-<img src="http://pirate.github.io/security-growler/screenshots/portscan_event.PNG" width="40%"/>
-<img src="http://pirate.github.io/security-growler/screenshots/vnc_event.PNG" width="40%"/>
+<img src="http://pirate.github.io/security-growler/screenshots/portscan_event.PNG" width="45%"/>
+<img src="http://pirate.github.io/security-growler/screenshots/vnc_event.PNG" width="45%"/>
 
-This menubar app for OS X will notify you via Notifcation Center (or Growl) when various security events occur (list below).
+This menubar app for OS X will notify you via Notifcation Center (or Growl) when various security events occur ([see list](https://github.com/pirate/security-growler#information)).
 
 It's very useful if you're paranoid about people trying to hack into your computer.  Or... if you simply like having information about people using your computer's resources.
 
@@ -14,10 +14,10 @@ It's easily extensible in python, you can add modules that watch ports for conne
 1. Download and run [Security Growler.app](https://github.com/nikisweeting/security-growler/raw/master/Security-Growler.app.zip)
 2. Click on the menubar icon once to start detecting events.
 
-Optionally, run `sudo easy_install gntp` in Terminal to enable Growl support (otherwise it defaults to using OS X Notification Center).
+Optionally, run `sudo easy_install gntp` in Terminal to enable [Growl](http://growl.info) support (otherwise it defaults to using OS X Notification Center).
 
-<img src="http://pirate.github.io/security-growler/screenshots/menubar_1.PNG" width="45%" margin-bottom="300px"/>
 <img src="http://pirate.github.io/security-growler/screenshots/menubar_2.PNG" width="45%"/>
+<img src="http://pirate.github.io/security-growler/screenshots/menubar_1.PNG" width="45%"/>
 
 ## It can do cool things like:
 
@@ -26,23 +26,22 @@ Optionally, run `sudo easy_install gntp` in Terminal to enable Growl support (ot
 <img src="http://pirate.github.io/security-growler/screenshots/ssh_fail_event.PNG" width="40%"/>
 <img src="http://pirate.github.io/security-growler/screenshots/ssh_key_event.PNG" width="40%"/>
 
-**Notify you of arbitrary TCP connections: VNC, PostgreSQL, even plain HTTP:**
+**Notify you of arbitrary TCP connections: VNC, FTP, SMB, MySQL, PostgreSQL, etc.:**
 
 <img src="http://pirate.github.io/security-growler/screenshots/vnc_event.PNG" width="40%"/>
 <img src="http://pirate.github.io/security-growler/screenshots/connection_event.PNG" width="40%"/>
 
-**Notify you whenever a command is run with sudo:**
+**Notify you whenever a command is run with `sudo`:**
 
 <!-- ![](http://pirate.github.io/security-growler/screenshots/sudo_event.PNG) -->
-<img src="http://pirate.github.io/security-growler/screenshots/sudo_context.PNG" height="400px"/>
+<img src="http://pirate.github.io/security-growler/screenshots/sudo_context.PNG" height="350px"/>
 
 **Let you know when you're being portscanned:**
 
-<img src="http://pirate.github.io/security-growler/screenshots/portscan_context.PNG" height="400px"/>
+<img src="http://pirate.github.io/security-growler/screenshots/portscan_context.PNG" height="350px"/>
 
 [More Screenshots...](https://github.com/pirate/security-growler/tree/gh-pages/screenshots)
 
-----
 
 ## Information:
 
@@ -61,25 +60,25 @@ The currently working notifiers are:
  * sudo commands
  * port-scans (e.g. if you're on the receiving end of nmap)
 
-Feel free to submit a pull-request and add a new one (e.g. try writing one for http-auth)!
+Feel free to submit a [pull-request](https://github.com/pirate/security-growler/pulls) and add a [new parser](https://github.com/pirate/security-growler/blob/master/parsers/vnc.py) (e.g. try writing one for http-auth)!
 
 A related project is available for Linux users: [PushAlotAuth](https://github.com/benjojo/PushAlotAuth), it uses the PushALot push-notification platform.
 
 ## Developer Info:
 
-This app is composed of 3 main parts: sources, parsers, and loggers.
+This app is composed of 3 main parts: `sources`, `parsers`, and `loggers`.
 
- * `sources` are either file paths or port numbers, e.g. `/var/log/system.log` or `5900`
- * `parsers` take the text from the `sources`, and parse out various alerts, e.g. `ssh` or `sudo`
- * `loggers` are output channels for alerts, e.g. `stdout`, `osxnotifications`, or `growl`
+ * [`sources`](https://github.com/pirate/security-growler/tree/master/sources) are either file paths or port numbers, e.g. `/var/log/system.log` or `5900`
+ * [`parsers`](https://github.com/pirate/security-growler/tree/master/parsers) take the text from the `sources`, and parse out various alerts, e.g. `ssh` or `sudo`
+ * [`loggers`](https://github.com/pirate/security-growler/tree/master/loggers) are output channels for alerts, e.g. `stdout`, `osxnotifications`, or `growl`
 
-The main runloop is in `growler.py`, it reads lines out of the sources, passes them through parsers, then dispatches alerts before waiting a short delay and then looping.
+The main runloop is in [`growler.py`](https://github.com/pirate/security-growler/blob/master/growler.py), it reads lines out of the sources, passes them through parsers, then dispatches alerts before waiting a short delay and then looping.
 
-The menubar app is a simple wrapper compiled using [Platypus](http://www.macupdate.com/app/mac/12046/platypus).  `Security Growler.app` is packaged with copies of `growler.py` and all the other files it needs.
+The [menubar app](https://github.com/pirate/security-growler/tree/master/Security%20Growler.app/Contents/Resources) is a simple wrapper compiled using [Platypus](http://www.macupdate.com/app/mac/12046/platypus).  `Security Growler.app` is packaged with copies of `growler.py` and all the other files it needs.
 To make changes to the app, change the files you need, test using `sudo python growler.py` and `sudo ./menubar.sh`, then re-run Platypus to generate a new app.
 
 The menubar app works by simply running `growler.py` (which writes to a log file), then `cat`ing the contents of the logfile to show in the dropdown.
-See `menubar.sh` for more details.
+See [`menubar.sh`](https://github.com/pirate/security-growler/blob/master/menubar.sh) for more details.
 
 
 ## License:
