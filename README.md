@@ -1,7 +1,5 @@
 # [Security Growler](https://pirate.github.io/security-growler)
 
-[Download >>](https://github.com/nikisweeting/security-growler/raw/master/Security-Growler.app.zip)
-
 <img src="http://pirate.github.io/security-growler/screenshots/portscan_event.PNG" width="45%"/>
 <img src="http://pirate.github.io/security-growler/screenshots/vnc_event.PNG" width="45%"/>
 
@@ -12,7 +10,7 @@ It's very useful if you're paranoid about people trying to hack into your comput
 It's easily extensible in python, you can add modules that watch ports for connetions or parse logfiles.  You can even forward alerts as push notiifcations to your iOS device using [Prowl](http://prowlapp.com/).
 
 ## Install:
-1. Download and run [Security Growler.app](https://github.com/nikisweeting/security-growler/raw/master/Security-Growler.app.zip)
+1. Download and run [Security Growler.app >>](https://github.com/nikisweeting/security-growler/raw/master/Security-Growler.app.zip)
 2. Click on the menubar icon once to start detecting events.
 
 If you prefer [Growl](http://growl.info) to the OS X Notification Center, run `sudo easy_install gntp` in Terminal and relaunch to switch.
