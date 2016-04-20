@@ -17,7 +17,7 @@ It's easily extensible in python, you can add modules that watch ports for conne
 Optionally, run `sudo easy_install gntp` in Terminal to enable [Growl](http://growl.info) support (otherwise it defaults to using OS X Notification Center).
 
 <img src="http://pirate.github.io/security-growler/screenshots/menubar_2.PNG" width="45%"/>
-<img src="http://pirate.github.io/security-growler/screenshots/menubar_1.PNG" width="45%"/>
+<img src="http://pirate.github.io/security-growler/screenshots/menubar_1.PNG" width="45%"/><br/><br/>
 
 ## It can do cool things like:
 
