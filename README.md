@@ -98,15 +98,6 @@ Change `POLLING_SPEED` to make the app update more or less frequently (2-10 seco
 Change the `INFO_` and `ALERT_` items to modify properties such as alert sounds, icons, and text.
 
 
-## Background:
-
-I was tired of not being able to find an app that would quell my paranoia about open ports, so I made one myself. Now I can relax whenever I'm in a seedy internet cafe or connected to free Boingo airport wifi because I know if anyone is trying to connect to my computer.
-
-Feel free to submit a [pull-request](https://github.com/pirate/security-growler/pulls) and add a [new parser](https://github.com/pirate/security-growler/blob/master/parsers/vnc.py) (e.g. try writing one for http-auth)!
-
-A related project is available for Linux users: [PushAlotAuth](https://github.com/benjojo/PushAlotAuth), it uses the PushALot push-notification platform.
-
-
 ## Developer Info:
 
 This app is composed of 3 main parts: `sources`, `parsers`, and `loggers`.
@@ -122,6 +113,15 @@ To make changes to the app, change the files you need, test using `sudo python g
 
 The menubar app works by simply running `growler.py` (which writes to a log file), then `cat`ing the contents of the logfile to show in the dropdown.
 See [`menubar.sh`](https://github.com/pirate/security-growler/blob/master/menubar.sh) for more details.
+
+
+## Background:
+
+I was tired of not being able to find an app that would quell my paranoia about open ports, so I made one myself. Now I can relax whenever I'm in a seedy internet cafe or connected to free Boingo airport wifi because I know if anyone is trying to connect to my computer.
+
+Feel free to submit a [pull-request](https://github.com/pirate/security-growler/pulls) and add a [new parser](https://github.com/pirate/security-growler/blob/master/parsers/vnc.py) (e.g. try writing one for http-auth)!
+
+A related project is available for Linux users: [PushAlotAuth](https://github.com/benjojo/PushAlotAuth), it uses the PushALot push-notification platform.
 
 
 ## License:
