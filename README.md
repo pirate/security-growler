@@ -1,23 +1,23 @@
 [Security Growler](http://pirate.github.io/security-growler)
 ========
 
-<center>
-    <img src="http://pirate.github.io/security-growler/screenshots/portscan_event.PNG" width="30%"/>
-    <img src="http://pirate.github.io/security-growler/screenshots/vnc_event.PNG" width="30%"/>
-</center>
+<img src="http://pirate.github.io/security-growler/screenshots/portscan_event.PNG" width="50%"/>
+<img src="http://pirate.github.io/security-growler/screenshots/vnc_event.PNG" width="50%"/>
 
-This menubar app for OS X will notify you via Growl or Notifcation Center if any SSH, FTP, VNC, AFP, or Sudo authentication events occur.  It's very useful if you're paranoid about people trying to hack into your computer.  Or... if you simply like having information about people using your computer's resources.  It's easily extensible in python, you can add modules that watch logfiles or processes and do whatever you want.  You can even send them as push notiifcations to your iOS device using [Prowl](http://prowlapp.com/).
+This menubar app for OS X will notify you via Growl or Notifcation Center when various system security events occur.
+
+It's very useful if you're paranoid about people trying to hack into your computer.  Or... if you simply like having information about people using your computer's resources.
+
+It's easily extensible in python, you can add modules that watch ports for connetions or parse logfiles.  You can even forward alerts as push notiifcations to your iOS device using [Prowl](http://prowlapp.com/).
 
 ## Install:
 1. Download and run [Security Growler.app](https://github.com/nikisweeting/security-growler/raw/master/Security-Growler.app.zip)
-2. Click on the menubar icon once to start detecting events
+2. Click on the menubar icon once to start detecting events.
 
 Optionally, run `sudo easy_install gntp` in Terminal to enable Growl support (otherwise it defaults to using OS X Notification Center).
 
-<center>
-    <img src="http://pirate.github.io/security-growler/screenshots/menubar_1.PNG" width="40%" style="vertical-align:top"/>
-    <img src="http://pirate.github.io/security-growler/screenshots/menubar_2.PNG" width="40%"/>
-</cemter>
+<img src="http://pirate.github.io/security-growler/screenshots/menubar_1.PNG" width="50%" margin-bottom="300px"/>
+<img src="http://pirate.github.io/security-growler/screenshots/menubar_2.PNG" width="50%"/>
 
 ## It can do cool things like:
 
