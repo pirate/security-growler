@@ -3,11 +3,11 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Security Growler</title>
+    <title>Security Growler by pirate</title>
 
     <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="stylesheets/github-light.css">
+    <meta name="viewport" content="width=device-width">
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
@@ -16,100 +16,177 @@
     <div class="wrapper">
       <header>
         <h1>Security Growler</h1>
-        <p>A Mac menubar app that notifies you via growl whenever an ssh, ftp, vnc, sudo, or afp login to your machine occurs. (Not Yosemite Ready yet)</p>
+        <p>A Mac menubar app that notifies you whenever security events like ssh, ftp, vnc, or sudo auth, occur on your machine.</p>
 
         <p class="view"><a href="https://github.com/pirate/security-growler">View the Project on GitHub <small>pirate/security-growler</small></a></p>
-        <iframe src="http://ghbtns.com/github-btn.html?user=pirate&repo=security-growler&type=watch&count=true" height="30" width="118" frameborder="0" scrolling="0" style="width:118px; height: 30px;" allowTransparency="true"></iframe>
-        <iframe src="http://ghbtns.com/github-btn.html?user=pirate&repo=security-growler&type=fork&count=false" height="30" width="118" frameborder="0" scrolling="0" style="width:118px; height: 30px;" allowTransparency="true"></iframe>
+
+
         <ul>
-          <li><a href="https://github.com/pirate/security-growler/zipball/master">Download <strong>APP</strong></a></li>
-          <li><a href="https://github.com/pirate/security-growler/tarball/master">Download <strong>Source ZIP</strong></a></li>
+          <li><a href="https://github.com/pirate/security-growler/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/pirate/security-growler/tarball/master">Download <strong>TAR Ball</strong></a></li>
           <li><a href="https://github.com/pirate/security-growler">View On <strong>GitHub</strong></a></li>
         </ul>
       </header>
       <section>
         <h1>
-<a name="security-growler" class="anchor" href="#security-growler"><span class="octicon octicon-link"></span></a>Security Growler
-  <img height="40px" src="http://pirate.github.io/security-growler/alert.png" style="display: inline; margin: 5px; margin-bottom: -10px;"/>
+<a id="security-growler----" class="anchor" href="#security-growler----" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><a href="https://pirate.github.io/security-growler">Security Growler</a>   <a href="https://github.com/pirate/security-growler"><img src="https://img.shields.io/github/stars/pirate/security-growler.svg" alt="Build Status"></a> <a href="https://twitter.com/thesquashSH"><img src="https://img.shields.io/twitter/url/http/shields.io.svg?style=social" alt="Twitter URL"></a>
 </h1>
-<p>This menubar app for OS X will notify you via Growl or Notifcation Center if any SSH, FTP, VNC, AFP, or Sudo authentication events occur.  It's very useful if you're paranoid about people trying to hack into your computer.  Or... if you simply like having information about people using your computer's resources.  It's easily extensible in python, you can add modules that watch logfiles or processes and do whatever you want.<br><br>Use <a href="http://prowlapp.com/">Prowl</a> to send the notifications to you iPhone/iPad when you're away.</p>
+
+<p>This menubar app for OS X will notify you via Notifcation Center (or Growl) when various security events occur (<a href="https://github.com/pirate/security-growler#documentation">see list</a>).</p>
+
+<p><img src="http://pirate.github.io/security-growler/screenshots/portscan_event.PNG" width="45%">
+<img src="http://pirate.github.io/security-growler/screenshots/vnc_event.PNG" width="45%"></p>
+
+<p>It's very useful if you're paranoid about people trying to hack into your computer.  Or... if you simply like having information about people using your computer's resources.</p>
+
+<p>It's easily extensible in Python, you can add modules that watch ports for connetions or parse logfiles.
+You can even forward alerts as push notifications to your iOS devices using <a href="http://prowlapp.com/">Prowl</a>.</p>
 
 <h2>
-<a name="install" class="anchor" href="#install"><span class="octicon octicon-link"></span></a>Install:</h2>
+<a id="install" class="anchor" href="#install" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Install:</h2>
 
 <ol>
-<li>Download and run <a href="https://github.com/pirate/security-growler/raw/master/Security%20Growler.app.zip"><button>Security Growler.app</button></a>
+<li>Download and run <a href="https://github.com/nikisweeting/security-growler/raw/master/Security-Growler.app.zip">Security Growler.app &gt;&gt;</a>
 </li>
-<li>If you use <a href="http://growl.info/">Growl</a> instead of (10.8 and above's) Notification Center, run <code>sudo easy_install gntp</code> in Terminal to enable Growl support<br>
-(otherwise events are logged silently to the menubar)</li>
+<li>Click on the menubar icon once to start detecting events.</li>
 </ol>
 
-<img src="screenshot1.png" style="padding: 10px;"/>
-<img src="screenshot2.png" style="padding: 10px;"/>
+<p><img src="http://pirate.github.io/security-growler/screenshots/menubar_2.PNG" width="45%">
+<img src="http://pirate.github.io/security-growler/screenshots/menubar_1.PNG" width="45%"></p>
+
+<p>If you prefer <a href="http://growl.info">Growl</a> to the OS X Notification Center, run <code>sudo easy_install gntp</code> in Terminal and relaunch to switch.</p>
 
 <h2>
-<a name="information" class="anchor" href="#information"><span class="octicon octicon-link"></span></a>Information:</h2>
+<a id="it-can-do-cool-things-like" class="anchor" href="#it-can-do-cool-things-like" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>It can do cool things like:</h2>
 
-<p>I was tired of not being able to find an app that would quell my paranoia about open ports, so I made one myself.  Now I can relax whenever I'm in a seedy internet cafe or connected to free Boingo airport wifi because I know if anyone is trying to connect to my computer.</p>
+<p><strong>Alert you to attempted and succesfull SSH logins:</strong></p>
 
-<p>This app will notify you if any SSH, FTP, VNC, AFP, or Sudo auth events occur.  <br><br>It does <b>not</b> increase your security in any way, it just notifies you <b>who</b> and <b>when</b> people are authenticated on your computer.  It also notifies you whenever an apache error occurs (although you may want to turn this off if you develop locally, getting growl bubbles on every pageload is annoying).</p>
+<p><img src="http://pirate.github.io/security-growler/screenshots/ssh_fail_event.PNG" width="40%">
+<img src="http://pirate.github.io/security-growler/screenshots/ssh_key_event.PNG" width="40%"></p>
 
-<h2>To disable apache error notifications:</h2>
-<p>Simply comment out these three lines in <code>Security Growler.app/Contents/Resources/growler.py</code></p>
+<p><strong>Notify you of arbitrary TCP connections: VNC, FTP, SMB, MySQL, PostgreSQL, etc.:</strong></p>
 
-<pre><code>  #if apache_event:
-  #    print("[&gt;] secnotify[%s]: %s" % (apache_event, apache_line))
-  #    notify(content=apache_line, title=apache_event)
-</code></pre>
+<p><img src="http://pirate.github.io/security-growler/screenshots/vnc_event.PNG" width="40%">
+<img src="http://pirate.github.io/security-growler/screenshots/connection_event.PNG" width="40%"></p>
+
+<p><strong>Notify you whenever a command is run with <code>sudo</code>:</strong></p>
+
+
+
+<p><img src="http://pirate.github.io/security-growler/screenshots/sudo_context.PNG" height="350px"></p>
+
+<p><strong>Let you know when you're being portscanned:</strong></p>
+
+<p><img src="http://pirate.github.io/security-growler/screenshots/portscan_context.PNG" height="350px"></p>
+
+<p><a href="https://github.com/pirate/security-growler/tree/gh-pages/screenshots">More Screenshots...</a></p>
+
+<h2>
+<a id="documentation" class="anchor" href="#documentation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Documentation:</h2>
+
+<p>The currently working notifiers are:</p>
+
+<ul>
+<li>SSH</li>
+<li>FTP</li>
+<li>SMB</li>
+<li>AFP</li>
+<li>VNC</li>
+<li>MySQL</li>
+<li>PostgreSQL</li>
+<li>iTunes Sharing</li>
+<li>sudo commands</li>
+<li>port-scans (e.g. if you're on the receiving end of nmap)</li>
+</ul>
+
+<p>Settings are changed by editing a text file <code>settings.py</code>, accesible via the menubar dropdown item 'Settings...'.</p>
+
+<p><strong>To enable or disable alert types:</strong></p>
+
+<p>You can enable and disable certain alerts by editing the <code>WATCHED_SOURCES</code> section of the file.
+Simply add or remove event sources on the left (either port numbers or logfile paths), and put the parsers you want to enable on the right.</p>
+
+<div class="highlight highlight-source-python"><pre><span class="pl-c"># e.g. this config only alerts for FTP, iTunes Sharing, sudo, &amp; SSH</span>
+<span class="pl-c1">WATCHED_SOURCES</span> <span class="pl-k">=</span> {
+    <span class="pl-c1">21</span>:                    <span class="pl-s"><span class="pl-pds">'</span>connections<span class="pl-pds">'</span></span>,      <span class="pl-c"># FTP</span>
+    <span class="pl-c1">3689</span>:                  <span class="pl-s"><span class="pl-pds">'</span>connections<span class="pl-pds">'</span></span>,      <span class="pl-c"># iTunes Sharing</span>
+    <span class="pl-s"><span class="pl-pds">'</span>/var/log/system.log<span class="pl-pds">'</span></span>: (<span class="pl-s"><span class="pl-pds">'</span>sudo<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>ssh<span class="pl-pds">'</span></span>),    <span class="pl-c"># sudo &amp; ssh</span>
+}</pre></div>
+
+<p><strong>To enable or disable alert channels, such as Notifcation Center or Growl:</strong></p>
+
+<p>Edit the settings file by using the 'Settings...' dropdown item.
+Change the <code>LOGGERS</code> section to suit your needs.</p>
+
+<div class="highlight highlight-source-python"><pre><span class="pl-c1">LOGGERS</span> <span class="pl-k">=</span> [
+    <span class="pl-s"><span class="pl-pds">'</span>stdout<span class="pl-pds">'</span></span>,
+    <span class="pl-s"><span class="pl-pds">'</span>logfile<span class="pl-pds">'</span></span>,
+    <span class="pl-s"><span class="pl-pds">'</span>growl<span class="pl-pds">'</span></span>,
+    <span class="pl-c"># 'osxnotifications',  # prepend a hash to disable a certain channel</span>
+]</pre></div>
+
+<p><strong>To change event display preferences:</strong></p>
+
+<p>Edit the settings file by using the 'Settings...' dropdown item.</p>
+
+<p>Change <code>POLLING_SPEED</code> to make the app update more or less frequently (2-10 seconds is recommended).
+Change the <code>INFO_</code> and <code>ALERT_</code> items to modify properties such as alert sounds, icons, and text.</p>
+
+<h2>
+<a id="developer-info" class="anchor" href="#developer-info" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Developer Info:</h2>
+
+<p>This app is composed of 3 main parts: <code>sources</code>, <code>parsers</code>, and <code>loggers</code>.</p>
+
+<ul>
+<li>
+<a href="https://github.com/pirate/security-growler/tree/master/sources"><code>sources</code></a> are either file paths or port numbers, e.g. <code>/var/log/system.log</code> or <code>5900</code>
+</li>
+<li>
+<a href="https://github.com/pirate/security-growler/tree/master/parsers"><code>parsers</code></a> take the text from the <code>sources</code>, and parse out various alerts, e.g. <code>ssh</code> or <code>sudo</code>
+</li>
+<li>
+<a href="https://github.com/pirate/security-growler/tree/master/loggers"><code>loggers</code></a> are output channels for alerts, e.g. <code>stdout</code>, <code>osxnotifications</code>, or <code>growl</code>
+</li>
+</ul>
+
+<p>The main runloop is in <a href="https://github.com/pirate/security-growler/blob/master/growler.py"><code>growler.py</code></a>, it reads lines out of the sources, passes them through parsers, then dispatches alerts before waiting a short delay and then looping.</p>
+
+<p>The <a href="https://github.com/pirate/security-growler/tree/master/Security%20Growler.app/Contents/Resources">menubar app</a> is a simple wrapper compiled using <a href="http://www.macupdate.com/app/mac/12046/platypus">Platypus</a>.  <code>Security Growler.app</code> is packaged with copies of <code>growler.py</code> and all the other files it needs.
+To make changes to the app, change the files you need, test using <code>sudo python growler.py</code> and <code>sudo ./menubar.sh</code>, then re-run Platypus to generate a new app.</p>
+
+<p>The menubar app works by simply running <code>growler.py</code> (which writes to a log file), then <code>cat</code>ing the contents of the logfile to show in the dropdown.
+See <a href="https://github.com/pirate/security-growler/blob/master/menubar.sh"><code>menubar.sh</code></a> for more details.</p>
+
+<h2>
+<a id="background" class="anchor" href="#background" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Background:</h2>
+
+<p>I was tired of not being able to find an app that would quell my paranoia about open ports, so I made one myself. Now I can relax whenever I'm in a seedy internet cafe or connected to free Boingo airport wifi because I know if anyone is trying to connect to my computer.</p>
+
+<p>Feel free to submit a <a href="https://github.com/pirate/security-growler/pulls">pull-request</a> and add a <a href="https://github.com/pirate/security-growler/blob/master/parsers/vnc.py">new parser</a> (e.g. try writing one for http-auth)!</p>
 
 <p>A related project is available for Linux users: <a href="https://github.com/benjojo/PushAlotAuth">PushAlotAuth</a>, it uses the PushALot push-notification platform.</p>
 
-<p><strong><a href="http://nicksweeting.com">nicksweeting.com</a> 2014 -- MIT License</strong>  </p>
+<h2>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>License:</h2>
+
+<p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, pulverize, distribute, synergize, compost, defenestrate, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</p>
+
+<p>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.</p>
+
+<p>If the Author of the Software (the "Author") needs a place to crash and you have a sofa available, you should maybe give the Author a break and let him sleep on your couch.</p>
+
+<p>If you are caught in a dire situation wherein you only have enough time to save one person out of a group, and the Author is a member of that group, you must save the Author.</p>
+
+<p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO BLAH BLAH BLAH ISN'T IT FUNNY HOW UPPER-CASE MAKES IT SOUND LIKE THE LICENSE IS ANGRY AND SHOUTING AT YOU.</p>
+
+<p><img src="http://pirate.github.io/security-growler/screenshots/menubar_3.PNG" width="100%"></p>
       </section>
       <footer>
-        <p><small><a href="https://nicksweeting.com">Nick Sweeting</a></small></p>
-        <img width="200px" src="http://nicksweeting.com/squash.png"/>
-        <p>I'm an 18 year old dev who likes open source.  I'm currently working for <a href="http://drchrono.com">drchrono</a></p>
+        <p>This project is maintained by <a href="https://github.com/pirate">pirate</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
       </footer>
     </div>
     <script src="javascripts/scale.fix.js"></script>
-
-    <!-- Piwik -->
-    <script type="text/javascript">
-      var _paq = _paq || [];
-      _paq.push(["trackPageView"]);
-      _paq.push(["enableLinkTracking"]);
-
-      (function() {
-        var u=(("https:" == document.location.protocol) ? "https" : "http") + "://nicksweeting.com/piwik/";
-        _paq.push(["setTrackerUrl", u+"piwik.php"]);
-        _paq.push(["setSiteId", "5"]);
-        var d=document, g=d.createElement("script"), s=d.getElementsByTagName("script")[0]; g.type="text/javascript";
-        g.defer=true; g.async=true; g.src=u+"piwik.js"; s.parentNode.insertBefore(g,s);
-      })();
-    </script>
-    <!-- End Piwik Code -->
-
-    <!-- Start Open Web Analytics Tracker -->
-    <script type="text/javascript">
-    //<![CDATA[
-    var owa_baseUrl = 'http://nicksweeting.com/analytics/';
-    var owa_cmds = owa_cmds || [];
-    owa_cmds.push(['setSiteId', 'a9455ca8585a545ab86f83fc3619cab8']);
-    owa_cmds.push(['trackPageView']);
-    owa_cmds.push(['trackClicks']);
-    owa_cmds.push(['trackDomStream']);
-
-    (function() {
-      var _owa = document.createElement('script'); _owa.type = 'text/javascript'; _owa.async = true;
-      owa_baseUrl = ('https:' == document.location.protocol ? window.owa_baseSecUrl || owa_baseUrl.replace(/http:/, 'https:') : owa_baseUrl );
-      _owa.src = owa_baseUrl + 'modules/base/js/owa.tracker-combined-min.js';
-      var _owa_s = document.getElementsByTagName('script')[0]; _owa_s.parentNode.insertBefore(_owa, _owa_s);
-    }());
-    //]]>
-    </script>
-    <!-- End Open Web Analytics Code -->
-
-
+    
   </body>
 </html>
