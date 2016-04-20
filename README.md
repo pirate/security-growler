@@ -7,7 +7,8 @@ This menubar app for OS X will notify you via Notifcation Center (or Growl) when
 
 It's very useful if you're paranoid about people trying to hack into your computer.  Or... if you simply like having information about people using your computer's resources.
 
-It's easily extensible in python, you can add modules that watch ports for connetions or parse logfiles.  You can even forward alerts as push notiifcations to your iOS device using [Prowl](http://prowlapp.com/).
+It's easily extensible in Python, you can add modules that watch ports for connetions or parse logfiles.
+You can even forward alerts as push notifications to your iOS devices using [Prowl](http://prowlapp.com/).
 
 ## Install:
 1. Download and run [Security Growler.app >>](https://github.com/nikisweeting/security-growler/raw/master/Security-Growler.app.zip)
