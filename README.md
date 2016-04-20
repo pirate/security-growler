@@ -1,10 +1,9 @@
-[Security Growler](http://pirate.github.io/security-growler)
-========
+# [Security Growler](https://pirate.github.io/security-growler) ([Mac App](https://github.com/nikisweeting/security-growler/raw/master/Security-Growler.app.zip))
 
 <img src="http://pirate.github.io/security-growler/screenshots/portscan_event.PNG" width="45%"/>
 <img src="http://pirate.github.io/security-growler/screenshots/vnc_event.PNG" width="45%"/>
 
-This menubar app for OS X will notify you via Notifcation Center (or Growl) when various security events occur ([see list](https://github.com/pirate/security-growler#information)).
+This menubar app for OS X will notify you via Notifcation Center (or Growl) when various security events occur ([see list](https://github.com/pirate/security-growler#documentation)).
 
 It's very useful if you're paranoid about people trying to hack into your computer.  Or... if you simply like having information about people using your computer's resources.
 
@@ -65,10 +64,11 @@ You can enable and disable certain alerts by editing the `WATCHED_SOURCES` secti
 Simply add or remove event sources on the left (either port numbers or logfile paths), and put the parsers you want to enable on the right.
 
 ```python
-# e.g. this config only alerts for sudo, ssh, and FTP
+# e.g. this config only alerts for FTP, iTunes Sharing, sudo, & SSH
 WATCHED_SOURCES = {
-    21: 'connections'
-    '/var/log/system.log': ('sudo', 'ssh'),
+    21:                    'connections',      # FTP
+    3689:                  'connections',      # iTunes Sharing
+    '/var/log/system.log': ('sudo', 'ssh'),    # sudo & ssh
 }
 ```
 
@@ -81,8 +81,8 @@ Change the `LOGGERS` section to suit your needs.
 LOGGERS = [
     'stdout',
     'logfile',
-    # 'osxnotifications',  # prepend a hash to disable a certain channel
     'growl',
+    # 'osxnotifications',  # prepend a hash to disable a certain channel
 ]
 ```
 
