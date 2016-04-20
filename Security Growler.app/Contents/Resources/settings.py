@@ -11,6 +11,7 @@ WATCHED_SOURCES = {
     445: 'connections',     # SMB
     585: 'connections',     # AFP
     3689: 'connections',    # iTunes sharing
+    3306: 'connections',    # MySQL
     5432: 'connections',    # PostgreSQL
     5900: 'vnc',            # VNC
     '/var/log/system.log': ('sudo', 'ssh', 'portscan'),
@@ -32,14 +33,14 @@ EVENT_LOGFILE = expanduser('~/SecurityGrowler.log')
 
 # Growl/OSX notification display settings
 INFO_TYPE = 'secnotify'
-INFO_ICON = 'http://i.imgur.com/auYfC7O.png'
+INFO_ICON = 'https://pirate.github.io/security-growler/notify.png'
 INFO_TITLE = 'Security Info'
 INFO_STICKY = False
 INFO_PRIORITY = 1
 INFO_SOUND = False
 
 ALERT_TYPE = 'secalert'
-ALERT_ICON = 'http://i.imgur.com/auYfC7O.png'
+ALERT_ICON = 'https://pirate.github.io/security-growler/alert.png'
 ALERT_TITLE = 'Security ALERT'
 ALERT_STICKY = True
 ALERT_PRIORITY = 2
