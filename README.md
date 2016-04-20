@@ -4,7 +4,7 @@
 <img src="http://pirate.github.io/security-growler/screenshots/portscan_event.PNG" width="40%"/>
 <img src="http://pirate.github.io/security-growler/screenshots/vnc_event.PNG" width="40%"/>
 
-This menubar app for OS X will notify you via Notifcation Center (or Growl) when various system security events occur (full list of supported events below).
+This menubar app for OS X will notify you via Notifcation Center (or Growl) when various security events occur (list below).
 
 It's very useful if you're paranoid about people trying to hack into your computer.  Or... if you simply like having information about people using your computer's resources.
 
