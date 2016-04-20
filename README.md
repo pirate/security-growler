@@ -50,16 +50,16 @@ I was tired of not being able to find an app that would quell my paranoia about 
 
 The currently working notifiers are:
 
-    * SSH
-    * FTP
-    * SMB
-    * AFP
-    * VNC
-    * MySQL
-    * PostgreSQL
-    * iTunes Sharing
-    * sudo commands
-    * port-scans (e.g. if you're on the receiving end of nmap)
+ * SSH
+ * FTP
+ * SMB
+ * AFP
+ * VNC
+ * MySQL
+ * PostgreSQL
+ * iTunes Sharing
+ * sudo commands
+ * port-scans (e.g. if you're on the receiving end of nmap)
 
 Feel free to submit a pull-request and add a new one (e.g. try writing one for http-auth)!
 
