@@ -12,7 +12,7 @@ You can even forward alerts as push notifications to your iOS devices using [Pro
 
 
 ## Install:
-1. Download and run [Security Growler.app >>](https://github.com/nikisweeting/security-growler/raw/master/Security-Growler.app.zip)
+1. Download and run [Security Growler.app >>](https://github.com/pirate/security-growler/raw/master/Security%20Growler.app.zip)
 2. Click on the menubar icon once to start detecting events.
 
 <img src="http://pirate.github.io/security-growler/screenshots/menubar_2.PNG" width="45%"/>
