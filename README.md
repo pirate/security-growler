@@ -10,14 +10,16 @@ It's very useful if you're paranoid about people trying to hack into your comput
 It's easily extensible in Python, you can add modules that watch ports for connetions or parse logfiles.
 You can even forward alerts as push notifications to your iOS devices using [Prowl](http://prowlapp.com/).
 
+
 ## Install:
 1. Download and run [Security Growler.app >>](https://github.com/nikisweeting/security-growler/raw/master/Security-Growler.app.zip)
 2. Click on the menubar icon once to start detecting events.
 
-If you prefer [Growl](http://growl.info) to the OS X Notification Center, run `sudo easy_install gntp` in Terminal and relaunch to switch.
-
 <img src="http://pirate.github.io/security-growler/screenshots/menubar_2.PNG" width="45%"/>
 <img src="http://pirate.github.io/security-growler/screenshots/menubar_1.PNG" width="45%"/>
+
+If you prefer [Growl](http://growl.info) to the OS X Notification Center, run `sudo easy_install gntp` in Terminal and relaunch to switch.
+
 
 ## It can do cool things like:
 
@@ -41,6 +43,7 @@ If you prefer [Growl](http://growl.info) to the OS X Notification Center, run `s
 <img src="http://pirate.github.io/security-growler/screenshots/portscan_context.PNG" height="350px"/>
 
 [More Screenshots...](https://github.com/pirate/security-growler/tree/gh-pages/screenshots)
+
 
 ## Documentation:
 
@@ -102,6 +105,7 @@ I was tired of not being able to find an app that would quell my paranoia about 
 Feel free to submit a [pull-request](https://github.com/pirate/security-growler/pulls) and add a [new parser](https://github.com/pirate/security-growler/blob/master/parsers/vnc.py) (e.g. try writing one for http-auth)!
 
 A related project is available for Linux users: [PushAlotAuth](https://github.com/benjojo/PushAlotAuth), it uses the PushALot push-notification platform.
+
 
 ## Developer Info:
 
