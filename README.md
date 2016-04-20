@@ -1,4 +1,4 @@
-# [Security Growler](https://pirate.github.io/security-growler) ([Mac App](https://github.com/nikisweeting/security-growler/raw/master/Security-Growler.app.zip))
+# [Security Growler](https://pirate.github.io/security-growler) **([download app](https://github.com/nikisweeting/security-growler/raw/master/Security-Growler.app.zip))**
 
 <img src="http://pirate.github.io/security-growler/screenshots/portscan_event.PNG" width="45%"/>
 <img src="http://pirate.github.io/security-growler/screenshots/vnc_event.PNG" width="45%"/>
