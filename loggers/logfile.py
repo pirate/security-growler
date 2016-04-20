@@ -23,4 +23,4 @@ def notify(content, title=INFO_TITLE, icon=None):
 
 def alert(content, title=ALERT_TITLE, icon=None):
     if not content: return
-    log('[%s] ‼️  %s: %s' % (timestamp(), title, content))
+    log('[%s] ‼️ %s: %s' % (timestamp(), title, content))
