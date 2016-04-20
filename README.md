@@ -1,8 +1,12 @@
 [Security Growler](http://pirate.github.io/security-growler)
 ========
-This menubar app for OS X will notify you via Growl or Notifcation Center if any SSH, FTP, VNC, AFP, or Sudo authentication events occur.  It's very useful if you're paranoid about people trying to hack into your computer.  Or... if you simply like having information about people using your computer's resources.  It's easily extensible in python, you can add modules that watch logfiles or processes and do whatever you want.  You can even send them as push notiifcations to your iOS device using [Prowl](http://prowlapp.com/).
 
-<img src="http://pirate.github.io/security-growler/screenshots/portscan_event.PNG" width="30%" text-align="center"/>
+<center>
+    <img src="http://pirate.github.io/security-growler/screenshots/portscan_event.PNG" width="30%"/>
+    <img src="http://pirate.github.io/security-growler/screenshots/vnc_event.PNG" width="30%"/>
+</center>
+
+This menubar app for OS X will notify you via Growl or Notifcation Center if any SSH, FTP, VNC, AFP, or Sudo authentication events occur.  It's very useful if you're paranoid about people trying to hack into your computer.  Or... if you simply like having information about people using your computer's resources.  It's easily extensible in python, you can add modules that watch logfiles or processes and do whatever you want.  You can even send them as push notiifcations to your iOS device using [Prowl](http://prowlapp.com/).
 
 ## Install:
 1. Download and run [Security Growler.app](https://github.com/nikisweeting/security-growler/raw/master/Security-Growler.app.zip)
@@ -10,11 +14,12 @@ This menubar app for OS X will notify you via Growl or Notifcation Center if any
 
 Optionally, run `sudo easy_install gntp` in Terminal to enable Growl support (otherwise it defaults to using OS X Notification Center).
 
-<img src="http://pirate.github.io/security-growler/screenshots/menubar_1.PNG" width="40%" vertical-align="top"/>
-<img src="http://pirate.github.io/security-growler/screenshots/menubar_2.PNG" width="40%"/>
+<center>
+    <img src="http://pirate.github.io/security-growler/screenshots/menubar_1.PNG" width="40%" style="vertical-align:top"/>
+    <img src="http://pirate.github.io/security-growler/screenshots/menubar_2.PNG" width="40%"/>
+</cemter>
 
-
-### It can do cool things like:
+## It can do cool things like:
 
 **Alert you to attempted and succesfull SSH logins:**
 
@@ -35,8 +40,6 @@ Optionally, run `sudo easy_install gntp` in Terminal to enable Growl support (ot
 
 <img src="http://pirate.github.io/security-growler/screenshots/portscan_context.PNG" height="400px"/>
 
-<img src="http://pirate.github.io/security-growler/screenshots/menubar_3.PNG" height="400px"/>
-
 [More Screenshots...](https://github.com/pirate/security-growler/tree/gh-pages/screenshots)
 
 ----
@@ -53,10 +56,19 @@ A related project is available for Linux users: [PushAlotAuth](https://github.co
 
 ## Developer Info:
 
-The menubar app is a simple wrapper for the python script, compiled using [Platypus](http://www.macupdate.com/app/mac/12046/platypus).  `Security Growler-dev.app` is symlinked to run `growler.py` for development.  `Security Growler.app` is packaged and uses it's prebuilt `growler.py`.  To make changes to the app, change `menubar.sh`, and `growler.py`, and run `Security Growler-dev.app` to test your changes.  Once you're done, submit a pull request.
+This app is composed of 3 main parts: sources, parsers, and loggers.
 
-The menubar app works by simply running `growler.py` (which writes to a log file), then `cat`ing the contents of `/tmp/securitygrowlerevents.log` and displaying them in the dropdown.  See `menubar.sh` for more details.
+ * `sources` are either file paths or port numbers, e.g. `/var/log/system.log` or `5900`
+ * `parsers` take the text from the `sources`, and parse out various alerts, e.g. `ssh` or `sudo`
+ * `loggers` are output channels for alerts, e.g. `stdout`, `osxnotifications`, or `growl`
 
+The main runloop is in `growler.py`, it reads lines out of the sources, passes them through parsers, then dispatches alerts before waiting a short delay and then looping.
+
+The menubar app is a simple wrapper compiled using [Platypus](http://www.macupdate.com/app/mac/12046/platypus).  `Security Growler.app` is packaged with copies of `growler.py` and all the other files it needs.
+To make changes to the app, change the files you need, test using `sudo python growler.py` and `sudo ./menubar.sh`, then re-run Platypus to generate a new app.
+
+The menubar app works by simply running `growler.py` (which writes to a log file), then `cat`ing the contents of the logfile to show in the dropdown.
+See `menubar.sh` for more details.
 
 
 ## License:
@@ -70,3 +82,7 @@ If the Author of the Software (the "Author") needs a place to crash and you have
 If you are caught in a dire situation wherein you only have enough time to save one person out of a group, and the Author is a member of that group, you must save the Author.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO BLAH BLAH BLAH ISN'T IT FUNNY HOW UPPER-CASE MAKES IT SOUND LIKE THE LICENSE IS ANGRY AND SHOUTING AT YOU.
+
+
+
+<img src="http://pirate.github.io/security-growler/screenshots/menubar_3.PNG" width="100%"/>
