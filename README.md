@@ -2,36 +2,38 @@
 ========
 This menubar app for OS X will notify you via Growl or Notifcation Center if any SSH, FTP, VNC, AFP, or Sudo authentication events occur.  It's very useful if you're paranoid about people trying to hack into your computer.  Or... if you simply like having information about people using your computer's resources.  It's easily extensible in python, you can add modules that watch logfiles or processes and do whatever you want.  You can even send them as push notiifcations to your iOS device using [Prowl](http://prowlapp.com/).
 
+![](http://pirate.github.io/security-growler/screenshots/portscan_event.PNG)
+
 ## Install:
 1. Download and run [Security Growler.app](https://github.com/nikisweeting/security-growler/raw/master/Security-Growler.app.zip)
 2. Click on the menubar icon once to start detecting events
 
 Optionally, run `sudo easy_install gntp` in Terminal to enable Growl support (otherwise it defaults to using OS X Notification Center).
 
-![](http://pirate.github.io/security-growler/screenshots/menubar_1.PNG)
-![](http://pirate.github.io/security-growler/screenshots/menubar_2.PNG)
+![](http://pirate.github.io/security-growler/screenshots/menubar_1.PNG =400)
+![](http://pirate.github.io/security-growler/screenshots/menubar_2.PNG =400)
 
 ### It can do cool things like:
-
-**Let you know when you're being portscanned:**
-
-<!-- ![](http://pirate.github.io/security-growler/screenshots/portscan_context.PNG) -->
-![](http://pirate.github.io/security-growler/screenshots/portscan_event.PNG)
 
 **Alert you to attempted and succesfull SSH logins:**
 
 ![](http://pirate.github.io/security-growler/screenshots/ssh_fail_event.PNG)
 ![](http://pirate.github.io/security-growler/screenshots/ssh_key_event.PNG)
 
-**Notify you whenever a command is run with sudo:**
-
-<!-- ![](http://pirate.github.io/security-growler/screenshots/sudo_context.PNG) -->
-![](http://pirate.github.io/security-growler/screenshots/sudo_event.PNG)
-
 **Notify you of arbitrary TCP connections: VNC, PostgreSQL, even plain HTTP:**
 
 ![](http://pirate.github.io/security-growler/screenshots/vnc_event.PNG)
 ![](http://pirate.github.io/security-growler/screenshots/connection_event.PNG)
+
+**Notify you whenever a command is run with sudo:**
+
+![](http://pirate.github.io/security-growler/screenshots/sudo_event.PNG)
+![](http://pirate.github.io/security-growler/screenshots/sudo_context.PNG)
+
+**Let you know when you're being portscanned:**
+
+![](http://pirate.github.io/security-growler/screenshots/portscan_event.PNG)
+![](http://pirate.github.io/security-growler/screenshots/portscan_context.PNG)
 
 ![](http://pirate.github.io/security-growler/screenshots/menubar_3.PNG)
 
