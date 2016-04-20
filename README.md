@@ -2,7 +2,7 @@
 ========
 This menubar app for OS X will notify you via Growl or Notifcation Center if any SSH, FTP, VNC, AFP, or Sudo authentication events occur.  It's very useful if you're paranoid about people trying to hack into your computer.  Or... if you simply like having information about people using your computer's resources.  It's easily extensible in python, you can add modules that watch logfiles or processes and do whatever you want.  You can even send them as push notiifcations to your iOS device using [Prowl](http://prowlapp.com/).
 
-![](http://pirate.github.io/security-growler/screenshots/portscan_event.PNG)
+<img src="http://pirate.github.io/security-growler/screenshots/portscan_event.PNG" width="100px"/>
 
 ## Install:
 1. Download and run [Security Growler.app](https://github.com/nikisweeting/security-growler/raw/master/Security-Growler.app.zip)
@@ -10,8 +10,9 @@ This menubar app for OS X will notify you via Growl or Notifcation Center if any
 
 Optionally, run `sudo easy_install gntp` in Terminal to enable Growl support (otherwise it defaults to using OS X Notification Center).
 
-![](http://pirate.github.io/security-growler/screenshots/menubar_1.PNG =400)
-![](http://pirate.github.io/security-growler/screenshots/menubar_2.PNG =400)
+  |
+![](http://pirate.github.io/security-growler/screenshots/menubar_1.PNG) | ![](http://pirate.github.io/security-growler/screenshots/menubar_2.PNG)
+
 
 ### It can do cool things like:
 
