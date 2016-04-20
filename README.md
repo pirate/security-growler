@@ -7,7 +7,8 @@ This menubar app for OS X will notify you via Notifcation Center (or Growl) when
 
 It's very useful if you're paranoid about people trying to hack into your computer.  Or... if you simply like having information about people using your computer's resources.
 
-It's easily extensible in Python, you can add modules that watch ports for connetions or parse logfiles.
+It's extremely lightweight, the app is 3MB including the icon, with <0.01% CPU and <15MB of RAM used when running.
+It's easily extensible in Python, you can add parsers that detect new TCP connetions or poll logfiles.
 You can even forward alerts as push notifications to your iOS devices using [Prowl](http://prowlapp.com/).
 
 
@@ -52,19 +53,26 @@ The currently working notifiers are:
  * FTP
  * SMB
  * AFP
- * VNC
  * MySQL
  * PostgreSQL
  * iTunes Sharing
  * sudo commands
  * port-scans (e.g. if you're on the receiving end of nmap)
+ * VNC (requires app is run as root)
+
+TODO: 
+ * keychain auth events (`/var/log/authd.log`, `/var/log/accountpolicy.log`)
+ * new listening sockets under port 1000 opened
+ * Wifi events?
+
+### Config:
 
 Settings are changed by editing a text file `settings.py`, accesible via the menubar dropdown item 'Settings...'.
 
 **To enable or disable alert types:**
 
 You can enable and disable certain alerts by editing the `WATCHED_SOURCES` section of the file.
-Simply add or remove event sources on the left (either port numbers or logfile paths), and put the parsers you want to enable on the right.
+Simply add or remove event sources on the left (either port numbers or logfile paths), and put the parser names you want to enable for each source on the right.  Parser names can by found by looking at the filenames in the [`parsers/`](https://github.com/pirate/security-growler/tree/master/parsers) folder.
 
 ```python
 # e.g. this config only alerts for FTP, iTunes Sharing, sudo, & SSH
@@ -77,7 +85,6 @@ WATCHED_SOURCES = {
 
 **To enable or disable alert channels, such as Notifcation Center or Growl:**
 
-Edit the settings file by using the 'Settings...' dropdown item.
 Change the `LOGGERS` section to suit your needs.
 
 ```python
@@ -89,11 +96,10 @@ LOGGERS = [
 ]
 ```
 
-**To change event display preferences:**
+**To change notification preferences:**
 
-Edit the settings file by using the 'Settings...' dropdown item.
+Change `POLLING_SPEED` to make the app update more or less frequently (2-10 seconds is recommended).  
 
-Change `POLLING_SPEED` to make the app update more or less frequently (2-10 seconds is recommended).
 Change the `INFO_` and `ALERT_` items to modify properties such as alert sounds, icons, and text.
 
 
