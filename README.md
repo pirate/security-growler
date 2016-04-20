@@ -42,10 +42,7 @@ If you prefer [Growl](http://growl.info) to the OS X Notification Center, run `s
 
 [More Screenshots...](https://github.com/pirate/security-growler/tree/gh-pages/screenshots)
 
-
-## Information:
-
-I was tired of not being able to find an app that would quell my paranoia about open ports, so I made one myself. Now I can relax whenever I'm in a seedy internet cafe or connected to free Boingo airport wifi because I know if anyone is trying to connect to my computer.
+## Documentation:
 
 The currently working notifiers are:
 
@@ -59,6 +56,47 @@ The currently working notifiers are:
  * iTunes Sharing
  * sudo commands
  * port-scans (e.g. if you're on the receiving end of nmap)
+
+Settings are changed by editing a text file `settings.py`, accesible via the menubar dropdown item 'Settings...'.
+
+**To enable or disable alert types:**
+
+You can enable and disable certain alerts by editing the `WATCHED_SOURCES` section of the file.
+Simply add or remove event sources on the left (either port numbers or logfile paths), and put the parsers you want to enable on the right.
+
+```python
+# e.g. this config only alerts for sudo, ssh, and FTP
+WATCHED_SOURCES = {
+    21: 'connections'
+    '/var/log/system.log': ('sudo', 'ssh'),
+}
+```
+
+**To enable or disable alert channels, such as Notifcation Center or Growl:**
+
+Edit the settings file by using the 'Settings...' dropdown item.
+Change the `LOGGERS` section to suit your needs.
+
+```python
+LOGGERS = [
+    'stdout',
+    'logfile',
+    # 'osxnotifications',  # prepend a hash to disable a certain channel
+    'growl',
+]
+```
+
+**To change event display preferences:**
+
+Edit the settings file by using the 'Settings...' dropdown item.
+
+Change `POLLING_SPEED` to make the app update more or less frequently (2-10 seconds is recommended).
+Change the `INFO_` and `ALERT_` items to modify properties such as alert sounds, icons, and text.
+
+
+## Background:
+
+I was tired of not being able to find an app that would quell my paranoia about open ports, so I made one myself. Now I can relax whenever I'm in a seedy internet cafe or connected to free Boingo airport wifi because I know if anyone is trying to connect to my computer.
 
 Feel free to submit a [pull-request](https://github.com/pirate/security-growler/pulls) and add a [new parser](https://github.com/pirate/security-growler/blob/master/parsers/vnc.py) (e.g. try writing one for http-auth)!
 
