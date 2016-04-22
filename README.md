@@ -29,8 +29,9 @@ If you prefer [Growl](http://growl.info) to the OS X Notification Center, run `s
 <img src="http://pirate.github.io/security-growler/screenshots/ssh_fail_event.PNG" width="40%"/>
 <img src="http://pirate.github.io/security-growler/screenshots/ssh_key_event.PNG" width="40%"/>
 
-**Notify you of arbitrary TCP connections: VNC, FTP, SMB, MySQL, PostgreSQL, etc.:**
+**Notify you of incoming & outgoing TCP connections: FTP, VNC, SMB, MySQL, etc.:**
 
+(using less RAM than Little Snitch)  
 <img src="http://pirate.github.io/security-growler/screenshots/vnc_event.PNG" width="40%"/>
 <img src="http://pirate.github.io/security-growler/screenshots/connection_event.PNG" width="40%"/>
 
