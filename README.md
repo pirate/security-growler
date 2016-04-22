@@ -31,7 +31,7 @@ If you prefer [Growl](http://growl.info) to the OS X Notification Center, run `s
 
 **Notify you of incoming & outgoing TCP connections: FTP, VNC, SMB, MySQL, etc.:**
 
-(using less RAM than Little Snitch)  
+(using [less RAM](https://github.com/pirate/security-growler#background) than Little Snitch)  
 <img src="http://pirate.github.io/security-growler/screenshots/vnc_event.PNG" width="40%"/>
 <img src="http://pirate.github.io/security-growler/screenshots/connection_event.PNG" width="40%"/>
 
@@ -125,13 +125,13 @@ See [`menubar.sh`](https://github.com/pirate/security-growler/blob/master/menuba
 
 I was tired of not being able to find an app that would quell my paranoia about open ports, so I made one myself. Now I can relax whenever I'm in a seedy internet cafe or connected to free Boingo airport wifi because I know if anyone is trying to connect to my computer.
 
-[Little Snitch](https://www.obdev.at/products/littlesnitch/index.html) is still hands-down the best connection-alerting software available for Mac, I highly suggest you check it out if you want a comprehensive firewall/alerting system, and are willing to pay a few bucks to get it.  Security Growler is centered around parsing logfiles for any kind of generic pattern, not just monitoring the TCP connection table like Little Snitch.  For example, my app can alert you of `sudo` events, keychain auth events, and anything else you can think of that's reported to a logfile.  This app is significantly more lightweight than little-snitch, it comes in at <15mb of RAM used, simply because it aims to solve a simpler problem than Little Snitch.  This app is not designed to *prevent* malicious connections, that's what firewalls are for, it's just meant to keep an unobtrusive log, and alert you whenever important security events are happening.  The more informed you are, the better you can protect yourself.
+[Little Snitch](https://www.obdev.at/products/littlesnitch/index.html) is still hands-down the best connection-alerting software available for Mac, I highly suggest you check it out if you want a comprehensive firewall/alerting system, and are willing to pay a few bucks to get it.  Security Growler is centered around parsing logfiles for any kind of generic pattern, not just monitoring the TCP connection table like Little Snitch.  For example, my app can alert you of `sudo` events, keychain auth events, and anything else you can think of that's reported to a logfile.  This app is significantly more lightweight than Little Snitch, it comes in at <15mb of RAM used, simply because it aims to solve a simpler problem than Little Snitch.  This app is not designed to *prevent* malicious connections, that's what firewalls are for, it's just meant to keep an unobtrusive log, and alert you whenever important security events are happening.  The more informed you are, the better you can protect yourself.
 
-This app is meant for developers who frequenly run services that are open to their LAN, and just want to keep tabs on usage to make sure they aren't being abused by some local script kiddie.  Since the target audience is developers, I opted to leave some parts a little less n00b-friendly, such as the `settings.py` config system.
+This app is meant for developers who frequenly run services that are open to their LAN, and just want to keep tabs on usage to make sure they aren't being abused by some local script kiddie.  Since the target audience is developers, I opted to leave some parts a little less user-friendly, such as the `settings.py` config system.
 
-Feel free to submit a [pull-request](https://github.com/pirate/security-growler/pulls) and add a [new parser](https://github.com/pirate/security-growler/blob/master/parsers/vnc.py) (e.g. try writing one for http-auth)!
+Feel free to submit a [pull-request](https://github.com/pirate/security-growler/pulls) and add a [new parser](https://github.com/pirate/security-growler/blob/master/parsers/vnc.py) (e.g. try writing one for nginx http-auth)!
 
-A related project is available for Linux users: [PushAlotAuth](https://github.com/benjojo/PushAlotAuth), it uses the PushALot push-notification platform.
+A similar project written by @benjojo is available for Linux users: [PushAlotAuth](https://github.com/benjojo/PushAlotAuth), it uses the [PushALot](https://pushalot.com/) push-notification platform.
 
 
 ## License:
