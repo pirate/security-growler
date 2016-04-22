@@ -1,5 +1,3 @@
-import re
-
 TITLE = 'PORT {0} <- {1}'
 BODY = '{0} {1} ({2}) @ {3}'
 

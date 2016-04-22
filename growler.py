@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # Nick Sweeting (github.com/pirate) 2016
-# MIT Liscense
+# MIT License
 
 import traceback
 

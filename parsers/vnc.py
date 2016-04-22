@@ -1,7 +1,7 @@
 from .connections import parse_connection
 
 TITLE = 'VNC CONNECTED {0}'
-BODY = 'To: {0} {1} ({2}) -> {3}'
+BODY = 'To: {0} {1} ({2}) on {3}'
 
 def parse(line, source=None):
     conn = parse_connection(line, source)
