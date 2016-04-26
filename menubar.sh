@@ -12,9 +12,10 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
     open $OUTFILE
 
 [[ $1 == "Clear"* ]] &&
-    echo `date +"[%m/%d %H:%M]"` "---Cleared---" >> $OUTFILE
+    echo `date +"[%m/%d %H:%M]"` "--------" >> $OUTFILE
 
 [[ $1 == "Stop the background agent"* ]] &&
+    echo `date +"[%m/%d %H:%M]"` "Stopped." >> $OUTFILE &&
     kill `ps aux | grep 'growler\.py' | awk '{print $2}'` &&
     kill `ps aux | grep 'Security Growler\.app' | awk '{print $2}'` &&
     exit 0
@@ -49,7 +50,7 @@ then
     echo "Clear menubar log"
     echo "View the full log..."
     echo "—————————————————————————————————————————————————————————"
-    sed -n 'H; / ---Cleared---$/h; ${g;p;}' $OUTFILE | tail +2 | tail -30
+    sed -n 'H; / --------$/h; ${g;p;}' $OUTFILE | tail +2 | tail -30
     echo "—————————————————————————————————————————————————————————"
     echo "Request a Feature"
     echo "About Security Growler"
@@ -57,7 +58,7 @@ then
 
 # Otherwise start it and display the loading output
 else
-    echo `date +"[%m/%d %H:%M]"` "---Cleared---" >> $OUTFILE
+    echo `date +"[%m/%d %H:%M]"` "--------" >> $OUTFILE
     echo "               🍺      Starting...      🍺"
     echo " "
     echo " information:  pirate.github.io/security-growler"
