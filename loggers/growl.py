@@ -42,8 +42,6 @@ if not success:
 
 ### Exported functions for use in the app
 def notify(content, title=INFO_TITLE, icon=INFO_ICON):
-    if not content: return
-
     try:
         GROWL.notify(
             noteType=INFO_TYPE,
@@ -58,8 +56,6 @@ def notify(content, title=INFO_TITLE, icon=INFO_ICON):
 
 
 def alert(content, title=ALERT_TITLE, icon=ALERT_ICON):
-    if not content: return
-
     try:
         GROWL.notify(
             noteType=ALERT_TYPE,
