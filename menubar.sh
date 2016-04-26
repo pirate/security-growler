@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SERVICE=growler.py
-OUTFILE=~/SecurityGrowler.log
+OUTFILE=~/Library/Logs/SecurityGrowler.log
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # Menu-item actions
