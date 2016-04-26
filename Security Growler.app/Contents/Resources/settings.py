@@ -29,7 +29,7 @@ LOGGERS = [
 POLLING_SPEED = 2
 
 # File logger output settings
-EVENT_LOGFILE = expanduser('~/SecurityGrowler.log')
+EVENT_LOGFILE = expanduser('~/Library/Logs/SecurityGrowler.log')
 
 # Growl/OSX notification display settings
 INFO_TYPE = 'secnotify'

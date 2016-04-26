@@ -21,8 +21,6 @@ NOTIFICATION_CENTER = NSUserNotificationCenter.defaultUserNotificationCenter()
 
 ### Exported functions for use in the app
 def notify(content, title=INFO_TITLE, icon=None, sound=INFO_SOUND):
-    if not content: return
-
     notification = NSUserNotification.alloc().init()
     notification.setTitle_('{0} @ {1}'.format(title, timestamp()))
     notification.setInformativeText_(content)
@@ -31,8 +29,6 @@ def notify(content, title=INFO_TITLE, icon=None, sound=INFO_SOUND):
     NOTIFICATION_CENTER.deliverNotification_(notification)
 
 def alert(content, title=ALERT_TITLE, icon=None, sound=ALERT_SOUND):
-    if not content: return
-
     notification = NSUserNotification.alloc().init()
     notification.setTitle_('{0} @ {1}'.format(title, timestamp()))
     notification.setInformativeText_(content)
