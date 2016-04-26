@@ -11,7 +11,10 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 [[ $1 == "View the full log..."* ]] &&
     open $OUTFILE
 
-[[ $1 == "Stop the background agent..."* ]] &&
+[[ $1 == "Clear"* ]] &&
+    echo `date +"[%m/%d %H:%M]"` "---Cleared---" >> $OUTFILE
+
+[[ $1 == "Stop the background agent"* ]] &&
     kill `ps aux | grep 'growler\.py' | awk '{print $2}'` &&
     kill `ps aux | grep 'Security Growler\.app' | awk '{print $2}'` &&
     exit 0
@@ -25,7 +28,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 [[ $1 == " information: "* || $1 == "About Security Growler" ]] &&
     open 'https://pirate.github.io/security-growler/'
 
-[[ $1 == ' support: '* || $1 == "Request a Feature" ]] &&
+[[ $1 == " support: "* || $1 == "Request a Feature" ]] &&
     open 'https://github.com/pirate/security-growler/issues'
 
 # Helpful logfile line actions
@@ -42,19 +45,19 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # Growler is already running, display its output
 if ps ax | grep -v grep | grep $SERVICE > /dev/null
 then
-    echo "            🍺 Security Growler is running. 🍺"
     echo "Settings..."
+    echo "Clear menubar log"
     echo "View the full log..."
-    echo "Stop the background agent..."
     echo "—————————————————————————————————————————————————————————"
-    cat $OUTFILE
+    sed -n 'H; / ---Cleared---$/h; ${g;p;}' $OUTFILE | tail +2 | tail -30
     echo "—————————————————————————————————————————————————————————"
     echo "Request a Feature"
     echo "About Security Growler"
+    echo "Stop the background agent & Quit"
 
 # Otherwise start it and display the loading output
 else
-    rm $OUTFILE
+    echo `date +"[%m/%d %H:%M]"` "---Cleared---" >> $OUTFILE
     echo "               🍺      Starting...      🍺"
     echo " "
     echo " information:  pirate.github.io/security-growler"
