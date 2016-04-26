@@ -31,7 +31,7 @@ If you prefer [Growl](http://growl.info) to the OS X Notification Center, run `s
 
 **Notify you of incoming & outgoing TCP connections: FTP, VNC, SMB, MySQL, etc.:**
 
-(using [less RAM](https://github.com/pirate/security-growler#background) than Little Snitch)  
+(using [less RAM](https://github.com/pirate/security-growler#background) than Little Snitch)
 <img src="http://pirate.github.io/security-growler/screenshots/vnc_event.PNG" width="40%"/>
 <img src="http://pirate.github.io/security-growler/screenshots/connection_event.PNG" width="40%"/>
 
@@ -61,7 +61,7 @@ The currently working alert types are:
  * port-scans (e.g. if you're on the receiving end of nmap)
  * VNC (detailed alerts require app is run as root)
 
-TODO: 
+TODO:
  * keychain auth events (`/var/log/authd.log`, `/var/log/accountpolicy.log`)
  * new listening sockets under port 1000 opened
  * Wifi events?
@@ -99,7 +99,7 @@ LOGGERS = [
 
 **To change notification preferences:**
 
-Change `POLLING_SPEED` to make the app update more or less frequently (2-10 seconds is recommended).  
+Change `POLLING_SPEED` to make the app update more or less frequently (2-10 seconds is recommended).
 
 Change the `INFO_` and `ALERT_` items to modify properties such as alert sounds, icons, and text.
 
