@@ -13,14 +13,13 @@ You can even forward alerts as push notifications to your iOS devices using [Pro
 
 
 ## Install:
-1. Download and run [Security Growler.app >>](https://github.com/pirate/security-growler/raw/master/Security%20Growler.app.zip)
+1. Download and run [Security Growler.app >>](https://github.com/pirate/security-growler/raw/master/Security%20Growler.app.zip) (dark mode)
 2. Click on the menubar icon once to start detecting events.
-
-Download [Security Growler Light.app](https://github.com/pirate/security-growler/raw/master/Security%20Growler%20Light.app.zip) if you don't use OS X Dark Mode.
 
 <img src="http://pirate.github.io/security-growler/screenshots/menubar_2.PNG" width="45%"/>
 <img src="http://pirate.github.io/security-growler/screenshots/menubar_1.PNG" width="45%"/>
 
+Download [Security Growler Light.app](https://github.com/pirate/security-growler/raw/master/Security%20Growler%20Light.app.zip) if you don't use OS X Dark Mode.
 If you prefer [Growl](http://growl.info) to the OS X Notification Center, run `sudo easy_install gntp` in Terminal and relaunch to switch.
 
 
