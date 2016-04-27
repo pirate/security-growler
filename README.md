@@ -60,6 +60,7 @@ The currently working alert types are:
  * PostgreSQL
  * iTunes Sharing
  * sudo commands
+ * [Ostiarius](https://objective-see.com/products/ostiarius.html)
  * port-scans (e.g. if you're on the receiving end of nmap)
  * VNC (detailed alerts require app is run as root)
 
