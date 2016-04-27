@@ -121,6 +121,7 @@ To make changes to the app, change the files you need, test using `sudo python g
 The menubar app works by simply running `growler.py` (which writes to a log file), then `cat`ing the contents of the logfile to show in the dropdown.
 See [`menubar.sh`](https://github.com/pirate/security-growler/blob/master/menubar.sh) for more details.
 
+The python Foundation library that provides access to OS X API's like notification center is not available by default for python3.5, so for the moment only 2.7 is supported.
 
 ## Background:
 
