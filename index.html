@@ -47,15 +47,15 @@ You can even forward alerts as push notifications to your iOS devices using <a h
 <a id="install" class="anchor" href="#install" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Install:</h2>
 
 <ol>
-<li>Download and run <a href="https://github.com/pirate/security-growler/raw/master/Security%20Growler.app.zip">Security Growler.app &gt;&gt;</a>
-</li>
+<li>Download and run <a href="https://github.com/pirate/security-growler/raw/master/Security%20Growler.app.zip">Security Growler.app &gt;&gt;</a> (dark mode)</li>
 <li>Click on the menubar icon once to start detecting events.</li>
 </ol>
 
 <p><img src="http://pirate.github.io/security-growler/screenshots/menubar_2.PNG" width="45%">
 <img src="http://pirate.github.io/security-growler/screenshots/menubar_1.PNG" width="45%"></p>
 
-<p>If you prefer <a href="http://growl.info">Growl</a> to the OS X Notification Center, run <code>sudo easy_install gntp</code> in Terminal and relaunch to switch.</p>
+<p>Download <a href="https://github.com/pirate/security-growler/raw/master/Security%20Growler%20Light.app.zip">Security Growler Light.app</a> if you don't use OS X Dark Mode.
+If you prefer <a href="http://growl.info">Growl</a> to the OS X Notification Center, run <code>sudo easy_install gntp</code> in Terminal and relaunch to switch.</p>
 
 <h2>
 <a id="it-can-do-cool-things-like" class="anchor" href="#it-can-do-cool-things-like" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>It can do cool things like:</h2>
@@ -67,8 +67,9 @@ You can even forward alerts as push notifications to your iOS devices using <a h
 
 <p><strong>Notify you of incoming &amp; outgoing TCP connections: FTP, VNC, SMB, MySQL, etc.:</strong></p>
 
-<p>(using <a href="https://github.com/pirate/security-growler#background">less RAM</a> than Little Snitch)<br>
-<img src="http://pirate.github.io/security-growler/screenshots/vnc_event.PNG" width="40%">
+<p>(using <a href="https://github.com/pirate/security-growler#background">less RAM</a> than Little Snitch)  </p>
+
+<p><img src="http://pirate.github.io/security-growler/screenshots/vnc_event.PNG" width="40%">
 <img src="http://pirate.github.io/security-growler/screenshots/connection_event.PNG" width="40%"></p>
 
 <p><strong>Notify you whenever a command is run with <code>sudo</code>:</strong></p>
@@ -95,11 +96,12 @@ You can even forward alerts as push notifications to your iOS devices using <a h
 <li>PostgreSQL</li>
 <li>iTunes Sharing</li>
 <li>sudo commands</li>
+<li><a href="https://objective-see.com/products/ostiarius.html">Ostiarius</a></li>
 <li>port-scans (e.g. if you're on the receiving end of nmap)</li>
 <li>VNC (detailed alerts require app is run as root)</li>
 </ul>
 
-<p>TODO: </p>
+<p>TODO:</p>
 
 <ul>
 <li>keychain auth events (<code>/var/log/authd.log</code>, <code>/var/log/accountpolicy.log</code>)</li>
@@ -137,7 +139,7 @@ Simply add or remove event sources on the left (either port numbers or logfile p
 
 <p><strong>To change notification preferences:</strong></p>
 
-<p>Change <code>POLLING_SPEED</code> to make the app update more or less frequently (2-10 seconds is recommended).  </p>
+<p>Change <code>POLLING_SPEED</code> to make the app update more or less frequently (2-10 seconds is recommended).</p>
 
 <p>Change the <code>INFO_</code> and <code>ALERT_</code> items to modify properties such as alert sounds, icons, and text.</p>
 
@@ -164,6 +166,8 @@ To make changes to the app, change the files you need, test using <code>sudo pyt
 
 <p>The menubar app works by simply running <code>growler.py</code> (which writes to a log file), then <code>cat</code>ing the contents of the logfile to show in the dropdown.
 See <a href="https://github.com/pirate/security-growler/blob/master/menubar.sh"><code>menubar.sh</code></a> for more details.</p>
+
+<p>The python Foundation library that provides access to OS X API's like notification center is not available by default for python3.5, so for the moment only 2.7 is supported.</p>
 
 <h2>
 <a id="background" class="anchor" href="#background" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Background:</h2>
