@@ -32,7 +32,8 @@ If you prefer [Growl](http://growl.info) to the OS X Notification Center, run `s
 
 **Notify you of incoming & outgoing TCP connections: FTP, VNC, SMB, MySQL, etc.:**
 
-(using [less RAM](https://github.com/pirate/security-growler#background) than Little Snitch)
+(using [less RAM](https://github.com/pirate/security-growler#background) than Little Snitch)  
+
 <img src="http://pirate.github.io/security-growler/screenshots/vnc_event.PNG" width="40%"/>
 <img src="http://pirate.github.io/security-growler/screenshots/connection_event.PNG" width="40%"/>
 
