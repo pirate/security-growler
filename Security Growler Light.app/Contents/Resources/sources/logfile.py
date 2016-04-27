@@ -8,8 +8,4 @@ def gen_lines(path):
         logfile.seek(0, 2)  # jump to end
         yield 'ready'       # otherwise it will hang until the first change appears
         while True:
-            next_line = logfile.readline().strip()
-            if next_line:
-                yield next_line
-            else:
-                yield None
+            yield logfile.readline().strip() or None

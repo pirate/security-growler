@@ -20644,7 +20644,7 @@
 	<key>Suffixes</key>
 	<array/>
 	<key>TextBackground</key>
-	<string>#ffffff</string>
+	<string>#dadada</string>
 	<key>TextEncoding</key>
 	<integer>4</integer>
 	<key>TextFont</key>

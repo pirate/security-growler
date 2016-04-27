@@ -1,5 +1,5 @@
-TITLE = 'PORT {0} <- {1}'
-BODY = '{0} {1} ({2}) @ {3}'
+TITLE = 'PORT {port} <- {source}'
+BODY = '{user} {process} ({pid}) @ {target}'
 
 def parse_connection(log_line, port=None):
     details = log_line.split()[:10]
@@ -25,13 +25,5 @@ def parse_connection(log_line, port=None):
 def parse(line, source=None):
     conn = parse_connection(line, source)
     if conn:
-        return ('notify',
-            TITLE.format(conn['port'], conn['source']),
-            BODY.format(
-                conn['user'],
-                conn['process'],
-                conn['pid'],
-                conn['target'],
-            ),
-        )
+        return ('notify', TITLE.format(**conn), BODY.format(**conn))
     return (None, '', '')
