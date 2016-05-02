@@ -2,7 +2,11 @@
 
 from __future__ import absolute_import
 import select
-from systemd import journal
+try:
+    from systemd import journal
+except ImportError:
+    raise Exception('You need the `python-systemd` library for Python 2.7. ' +
+                    'See: https://github.com/systemd/python-systemd/')
 
 def gen_lines():
     """generator which yields new lines from journalctl, or None"""
