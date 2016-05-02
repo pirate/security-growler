@@ -15,7 +15,8 @@ WATCHED_SOURCES = {
     3306: 'connections',    # MySQL
     5432: 'connections',    # PostgreSQL
     5900: 'vnc',            # VNC
-    '/var/log/system.log': ('sudo', 'ssh', 'portscan', 'ostiarius'),
+    #'/var/log/system.log': ('sudo', 'ssh', 'portscan', 'ostiarius'),
+    'systemd': ('sudo', 'ssh', 'portscan', 'ostiarius'),
 }
 
 # Enabled output/display methods
@@ -59,5 +60,5 @@ NOTIFICATION_TYPES = [INFO_TYPE, ALERT_TYPE]
 ### DO NOT MODIFY BELOW THIS LINE ###
 WATCHED_SOURCES = {
     source: parsers for source, parsers in WATCHED_SOURCES.items()
-    if type(source) == int or isfile(source)
+    if type(source) == int or isfile(source) or source == 'systemd'
 }
