@@ -10,8 +10,8 @@ def gen_lines():
     j.seek_tail()
     p = select.poll()
     p.register(j, j.get_events())
-    p.poll()
     yield 'ready'
+    p.poll()
     while True:
         line = j.get_next()
         if line:
