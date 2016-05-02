@@ -1,6 +1,7 @@
 """Setup and defaults for Security Growler app"""
 
 from os.path import expanduser, isfile
+from sys import platform as _platform
 
 APP_NAME = 'Security Growler'
 
@@ -21,7 +22,8 @@ WATCHED_SOURCES = {
 LOGGERS = [
     'stdout',
     'logfile',
-    'osxnotifications',
+    #'osxnotifications',
+    'gnomenotifications',
     # 'growl',
 ]
 
@@ -29,7 +31,11 @@ LOGGERS = [
 POLLING_SPEED = 2
 
 # File logger output settings
-EVENT_LOGFILE = expanduser('~/Library/Logs/SecurityGrowler.log')
+EVENT_LOGFILE = None
+if _platform == "Darwin":
+    EVENT_LOGFILE = expanduser('~/Library/Logs/SecurityGrowler.log')
+else:
+    EVENT_LOGFILE = expanduser('~/.logs/SecurityGrowler.log')
 
 # Growl/OSX notification display settings
 INFO_TYPE = 'secnotify'
