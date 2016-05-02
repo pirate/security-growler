@@ -16,7 +16,7 @@ WATCHED_SOURCES = {
     5432: 'connections',    # PostgreSQL
     5900: 'vnc',            # VNC
     #'/var/log/system.log': ('sudo', 'ssh', 'portscan', 'ostiarius'),
-    'systemd': ('sudo', 'ssh', 'portscan', 'ostiarius'),
+    'systemd': ('sudo', 'ssh', 'portscan'),
 }
 
 # Enabled output/display methods
