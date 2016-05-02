@@ -17,7 +17,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 [[ $1 == "Stop the background agent"* ]] &&
     echo `date +"[%m/%d %H:%M]"` "Stopped." >> $OUTFILE &&
     kill `ps aux | grep 'growler\.py' | awk '{print $2}'` &&
-    kill `ps aux | grep 'Security Growler\.app' | awk '{print $2}'` &&
+    kill `ps aux | grep 'Security Growler' | awk '{print $2}'` &&
     exit 0
 
 [[ $1 == " my website: "* ]] &&
