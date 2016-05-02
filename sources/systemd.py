@@ -11,6 +11,7 @@ def gen_lines():
     p = select.poll()
     p.register(j, j.get_events())
     p.poll()
+    yield 'ready'
     while True:
         line = j.get_next()
         if line:
