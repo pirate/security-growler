@@ -15,8 +15,8 @@ WATCHED_SOURCES = {
     3306: 'connections',    # MySQL
     5432: 'connections',    # PostgreSQL
     5900: 'vnc',            # VNC
-    #'/var/log/system.log': ('sudo', 'ssh', 'portscan', 'ostiarius'),
-    'systemd': ('sudo', 'ssh', 'portscan'),
+    '/var/log/system.log': ('sudo', 'ssh', 'portscan', 'ostiarius'),
+    #'systemd': ('sudo', 'ssh'),
 }
 
 # Enabled output/display methods
