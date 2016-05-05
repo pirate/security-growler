@@ -25,6 +25,17 @@ Open() {
     esac
 }
 
+Python() {
+    case $OS in
+        Darwin)
+            python $@
+            ;;
+        Linux)
+            python2 $@
+            ;;
+    esac
+}
+
 # Menu-item actions
 [[ $1 == "Settings..."* || $1 == *" Started Watching Sources"* || $1 == "port "* ]] &&
     Open "$DIR"/settings.py
@@ -89,7 +100,7 @@ else
     echo "   🍀   Tweet @thesquashSH if you like this app!    🍀  "
 
     # run Growler in the background and save its output to OUTFILE
-    python2 "$DIR"/"$SERVICE" 2>&1>> $OUTFILE &
+    Python "$DIR"/"$SERVICE" 2>&1>> $OUTFILE &
 fi
 
 sleep 0.1  # small delay to allow menubar to buffer text before rendering
