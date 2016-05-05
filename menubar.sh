@@ -1,15 +1,36 @@
 #!/bin/bash
 
+OS=$(uname -s)
 SERVICE=growler.py
-OUTFILE=~/Library/Logs/SecurityGrowler.log
+OUTFILE=/tmp/SecurityGrowler.log
+case $OS in
+    Darwin)
+        OUTFILE=~/Library/Logs/SecurityGrowler.log
+        ;;
+    Linux)
+        mkdir ~/.logs &>/dev/null
+        OUTFILE=~/.logs/SecurityGrowler.log
+        ;;
+esac
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+Open() {
+    case $OS in
+        Darwin)
+            open $@
+            ;;
+        Linux)
+            xdg-open $@
+            ;;
+    esac
+}
 
 # Menu-item actions
 [[ $1 == "Settings..."* || $1 == *" Started Watching Sources"* || $1 == "port "* ]] &&
-    open "$DIR"/settings.py
+    Open "$DIR"/settings.py
 
 [[ $1 == "View the full log..."* ]] &&
-    open $OUTFILE
+    Open $OUTFILE
 
 [[ $1 == "Clear"* ]] &&
     echo `date +"[%m/%d %H:%M]"` "--------" >> $OUTFILE
@@ -21,26 +42,26 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
     exit 0
 
 [[ $1 == " my website: "* ]] &&
-    open 'https://nicksweeting.com'
+    Open 'https://nicksweeting.com'
 
 [[ $1 == *"@thesquashSH"* ]] &&
-    open 'https://twitter.com/thesquashSH'
+    Open 'https://twitter.com/thesquashSH'
 
 [[ $1 == " information: "* || $1 == "About Security Growler" ]] &&
-    open 'https://pirate.github.io/security-growler/'
+    Open 'https://pirate.github.io/security-growler/'
 
 [[ $1 == " support: "* || $1 == "Request a Feature" ]] &&
-    open 'https://github.com/pirate/security-growler/issues'
+    Open 'https://github.com/pirate/security-growler/issues'
 
 # Helpful logfile line actions
 [[ $1 == *" VNC "* || $1 == *" PORT "* ]] &&
-    open '/System/Library/PreferencePanes/SharingPref.prefPane'
+    Open '/System/Library/PreferencePanes/SharingPref.prefPane'
 
 [[ $1 == *" SUDO "* ]] &&
-    open '/Applications/Utilities/Activity Monitor.app'
+    Open '/Applications/Utilities/Activity Monitor.app'
 
 [[ $1 == "/var/log/"* ]] &&
-    open /var/log/
+    Open /var/log/
 
 
 # Growler is already running, display its output
@@ -68,7 +89,7 @@ else
     echo "   🍀   Tweet @thesquashSH if you like this app!    🍀  "
 
     # run Growler in the background and save its output to OUTFILE
-    python "$DIR"/"$SERVICE" 2>&1>> $OUTFILE &
+    python2 "$DIR"/"$SERVICE" 2>&1>> $OUTFILE &
 fi
 
 sleep 0.1  # small delay to allow menubar to buffer text before rendering
