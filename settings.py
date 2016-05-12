@@ -15,18 +15,24 @@ WATCHED_SOURCES = {
     3306: 'connections',    # MySQL
     5432: 'connections',    # PostgreSQL
     5900: 'vnc',            # VNC
-    '/var/log/system.log': ('sudo', 'ssh', 'portscan', 'ostiarius'),
-    #'systemd': ('sudo', 'ssh'),
 }
+
+if _platform == "Darwin":
+    WATCHED_SOURCES['/var/log/system.log'] = ('sudo', 'ssh', 'portscan', 'ostiarius')
+else:
+    WATCHED_SOURCES['systemd'] = ('sudo', 'ssh')
 
 # Enabled output/display methods
 LOGGERS = [
     'stdout',
     'logfile',
-    #'osxnotifications',
-    'gnomenotifications',
     # 'growl',
 ]
+
+if _platform == "Darwin":
+    LOGGERS.append('osxnotifications')
+else:
+    LOGGERS.append('gnomenotifications')
 
 # Delay in seconds between logfile checks
 POLLING_SPEED = 2
