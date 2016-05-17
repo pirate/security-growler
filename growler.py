@@ -31,6 +31,8 @@ if __name__ == "__main__":
     try:
         watch_sources()
     except BaseException as e:
-        notify(type(e).__name__, 'Stopped Watching Sources')
         if isinstance(e, Exception):
-            traceback.print_exc()
+            notify(traceback.format_exc(), title='Stopped Watching Sources: %s' % type(e).__name__)
+        else:
+            notify('Quit by user: %s' % type(e).__name__, title='Stopped Watching Sources')
+        raise
