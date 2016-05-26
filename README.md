@@ -22,6 +22,7 @@ You can even forward alerts as push notifications to your iOS devices using [Pro
 Download [Security Growler Light.app](https://github.com/pirate/security-growler/raw/master/Security%20Growler%20Light.app.zip) if you don't use OS X Dark Mode.
 If you prefer [Growl](http://growl.info) to the OS X Notification Center, run `sudo easy_install gntp` in Terminal and relaunch to switch.
 
+Note: the app **must** be run under an account with admin-permissions.  It will not function under a standard-permissions account, as it needs access to several root-owned logfiles to be of any use.
 
 ## It can do cool things like:
 
