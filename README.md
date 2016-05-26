@@ -136,8 +136,9 @@ This app is meant for developers who frequenly run services that are open to the
 
 Feel free to submit a [pull-request](https://github.com/pirate/security-growler/pulls) and add a [new parser](https://github.com/pirate/security-growler/blob/master/parsers/vnc.py) (e.g. try writing one for nginx http-auth)!
 
-A similar project written by [@benjojo](https://github.com/benjojo) is available for Linux users: [PushAlotAuth](https://github.com/benjojo/PushAlotAuth), it uses the [PushALot](https://pushalot.com/) push-notification platform.
+Basic Linux support will be finished soon, in the meantime check out a similar project written by [@benjojo](https://github.com/benjojo): [PushAlotAuth](https://github.com/benjojo/PushAlotAuth), it uses the [PushALot](https://pushalot.com/) push-notification platform.
 
+Also check out our growing list of community-shared [useful Mac menubar apps](https://github.com/pirate/security-growler/issues/32)!
 
 ## License:
 
