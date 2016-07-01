@@ -1,6 +1,6 @@
 # [Security Growler](https://pirate.github.io/security-growler)  <img src="https://pirate.github.io/security-growler/alert.png" height="20px"/>  [![Build Status](https://img.shields.io/github/stars/pirate/security-growler.svg)](https://github.com/pirate/security-growler) [![Twitter URL](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/thesquashSH)
 
-This menubar app for OS X will notify you via Notifcation Center (or Growl) when various security events occur ([see list](https://github.com/pirate/security-growler#documentation)).
+This menubar app for OS X will notify you via Notification Center (or Growl) when various security events occur ([see list](https://github.com/pirate/security-growler#documentation)).
 
 <img src="http://pirate.github.io/security-growler/screenshots/portscan_event.PNG" width="45%"/>
 <img src="http://pirate.github.io/security-growler/screenshots/vnc_event.PNG" width="45%"/>
