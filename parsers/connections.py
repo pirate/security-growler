@@ -13,7 +13,7 @@ def parse_connection(log_line, port=None):
     return {
         'tcp_version': tcp_vers,
         'port': port or '',
-        'state': state[1:-1],  # remove parens (LISTEN) -> LISTEN
+        'state': state[1:-1],  # removes parens (LISTEN) -> LISTEN
         'user': user,
         'process': str(proc),
         'pid': pid,
@@ -25,5 +25,8 @@ def parse_connection(log_line, port=None):
 def parse(line, source=None):
     conn = parse_connection(line, source)
     if conn:
-        return ('notify', TITLE.format(**conn), BODY.format(**conn))
+        return ('notify',
+            TITLE.format(**conn),
+            BODY.format(**conn))
+
     return (None, '', '')
