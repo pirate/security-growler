@@ -3,7 +3,7 @@
 import os
 
 FAST_CMD = "netstat -tan | grep '[:.]{0}' | grep '{1}'"
-LSOF_CMD = "sudo lsof +c 0 -i:{0} | grep -v '^launchd ' | grep '{1}'"
+LSOF_CMD = "lsof +c 0 -i:{0} | grep -v '^launchd ' | grep '{1}'"  # ideally this should be with sudo
 
 def get_details(port, state='ESTABLISHED'):
     get_conn_details = LSOF_CMD.format(port, state or '.*')
