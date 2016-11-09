@@ -20644,13 +20644,13 @@
 	<key>Suffixes</key>
 	<array/>
 	<key>TextBackground</key>
-	<string>#1b1b1b</string>
+	<string>#6d676b</string>
 	<key>TextEncoding</key>
 	<integer>4</integer>
 	<key>TextFont</key>
 	<string>Menlo-Regular</string>
 	<key>TextForeground</key>
-	<string>#dadada</string>
+	<string>#c1c1c3</string>
 	<key>TextSize</key>
 	<real>12</real>
 	<key>UniformTypes</key>

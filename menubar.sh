@@ -36,7 +36,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 [[ $1 == " information: "* || $1 == "About Security Growler" ]] &&
     open 'https://pirate.github.io/security-growler/'
 
-[[ $1 == " support: "* || $1 == "Request a Feature" ]] &&
+[[ $1 == " support: "* || $1 == "Request a feature" ]] &&
     open 'https://github.com/pirate/security-growler/issues'
 
 # Helpful logfile line actions
