@@ -75,6 +75,7 @@ else
     echo " my website:   nicksweeting.com"
     echo " "
     echo "   🍀   Tweet @thesquashSH if you like this app!    🍀  "
+    pip install -q pyobjc
 
     # run Growler in the background and save its output to OUTFILE
     python "$DIR"/"$SERVICE" 2>&1>> $OUTFILE &
