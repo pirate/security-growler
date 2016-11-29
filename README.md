@@ -22,7 +22,9 @@ You can even forward alerts as push notifications to your iOS devices using [Pro
 Download [Security Growler Light.app](https://github.com/pirate/security-growler/raw/master/Security%20Growler%20Light.app.zip) if you don't use OS X Dark Mode.
 If you prefer [Growl](http://growl.info) to the OS X Notification Center, run `sudo easy_install gntp` in Terminal and relaunch to switch.
 
-Note: the app **must** be run under an account with admin-permissions.  It will not function under a standard-permissions account, as it needs access to several root-owned logfiles to be of any use.
+Note: the app **must** be run under an account that has read access to `cat /var/log/system.log` (i.e. run by an admin).  It will not function under a non-admin-permissions account on mac, as it needs access to several root-owned logfiles to be of any use.
+Running this app as a non-admin user simply doesn't make sense, because it wouldn't be ablye to alert on any log events in `/var/log/system.log` or on ports opened by other users.  It would be of very
+limited use, and would very few security assurances if it could only alert on sockets opened by your own user account.
 
 ## It can do cool things like:
 
