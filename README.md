@@ -11,7 +11,6 @@ It's extremely lightweight, the app is 3MB including the icon, with <0.01% CPU a
 It's easily extensible in Python, you can add parsers that detect new TCP connetions or poll logfiles.
 You can even forward alerts as push notifications to your iOS devices using [Prowl](http://prowlapp.com/).
 
-
 ## Install:
 1. Download and run [Security Growler.app >>](https://github.com/pirate/security-growler/raw/master/Security%20Growler.app.zip) (dark mode)
 2. Click on the menubar icon once to start detecting events.
@@ -56,21 +55,20 @@ limited use, and would very few security assurances if it could only alert on so
 The currently working alert types are:
 
  * SSH
- * FTP
- * SMB
- * AFP
- * MySQL
- * PostgreSQL
+ * VNC
+ * FTP, SMB, AFP
+ * MySQL, PostgreSQL
  * iTunes Sharing
  * sudo commands
  * [Ostiarius](https://objective-see.com/products/ostiarius.html)
  * port-scans (e.g. if you're on the receiving end of nmap)
- * VNC (detailed alerts require app is run as root)
+
+**Get more alerts like Wifi, VPN, LAN, bluetooth, USB device and other config changes using [HardwareGrowler](https://www.macupdate.com/app/mac/40750/hardwaregrowler) and [MetaGrowler](http://en.freedownloadmanager.org/Mac-OS/MetaGrowler-FREE.html).**
 
 TODO:
+ * new alerts types like ARP resolution, DNS resolution, etc. tracked via [issues](https://github.com/pirate/security-growler/issues/)
  * keychain auth events (`/var/log/authd.log`, `/var/log/accountpolicy.log`)
  * new listening sockets under port 1000 opened
- * Wifi events?
 
 ### Config:
 
@@ -141,6 +139,14 @@ Feel free to submit a [pull-request](https://github.com/pirate/security-growler/
 Basic Linux support will be finished soon, in the meantime check out a similar project written by [@benjojo](https://github.com/benjojo): [PushAlotAuth](https://github.com/benjojo/PushAlotAuth), it uses the [PushALot](https://pushalot.com/) push-notification platform.
 
 Also check out our growing list of community-shared [useful Mac menubar apps](https://github.com/pirate/security-growler/issues/32)!
+
+**Some security apps I recommend:**
+ - [HardwareGrowler](https://www.macupdate.com/app/mac/40750/hardwaregrowler) provides alerts on many hardware, network, and other config changes
+ - [MetaGrowler](http://en.freedownloadmanager.org/Mac-OS/MetaGrowler-FREE.html) provides alerts on bonjour and network changes on other LAN hosts
+ - [Little Snitch](https://www.obdev.at/products/littlesnitch/index.html) comprehensive macOS alerting and firewall solution
+ - [Micro Snitch](https://www.obdev.at/products/microsnitch/index.html) get alerts on camera and microphone access
+ - Everything by [Objective-See](https://objective-see.com/products.html), a great security app developer
+ - [CIRCL ALOD](http://www.circl.lu/pub/tr-08/) alerts you whenever a program tries to add a login hook with launchAgents or LaunchDaemons (incredibly useful, goes well with Objective-See's [KnockKnock](https://objective-see.com/products/knockknock.html))
 
 ## License:
 
