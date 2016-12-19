@@ -108,6 +108,24 @@ Change `POLLING_SPEED` to make the app update more or less frequently (2-10 seco
 Change the `INFO_` and `ALERT_` items to modify properties such as alert sounds, icons, and text.
 
 
+### How should you respond to alerts?
+
+In general, don't assume you're being attacked just because you get an alert, there are many possible situations where you may get false positives.  That being said, it's good to have some documented responses in case you actually are being attacked.  Here are some safe recommendations for what to do if you get different alerts in order to protect your system.
+
+ - New TCP connections: make sure the affected service (e.g. postgresql) is not publicly accessible, or has a strong password set (check your configs and firewall)
+ - New SSH connections: turn off Remote Login (ssh) under `System Preferences > Sharing > Remote Login`
+ - New VNC connections: turn off Screen Sharing & Remote Administration under `System Preferences > Sharing > Screen Sharing/Remote Administration`
+ - New FTP/AFP/SMB connections: turn off file sharing under `System Preferences > Sharing > File Sharing`
+ - iTunes Sharing: turn off iTunes sharing under `iTunes > Preferences... > Sharing > Share my library on my local network`
+ - Port scans: unplug your ethernet cable, turn off public services, or turn on your firewall to stealth mode: `sudo defaults write /Library/Preferences/com.apple.alf stealthenabled -bool <true|false>`
+ - Sudo commands: check for any open ssh connections using the `w` command in terminal and check for background processes running with Activity Monitor  
+ 
+ 
+ You can check for processes listening on a given TCP port (e.g. 80) using `sudo lsof +c 0 -i:80`.  
+ You can see active network connections with `sudo netstat -t` or `iftop` (`brew install iftop`).  
+ You can check for persistent background tasks and unauthorized processes running using [KnockKnock](https://objective-see.com/products/knockknock.html) and [TaskExplorer](https://objective-see.com/products/taskexplorer.html).
+
+
 ## Developer Info:
 
 This app is composed of 3 main parts: `sources`, `parsers`, and `loggers`.
