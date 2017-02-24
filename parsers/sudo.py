@@ -9,11 +9,14 @@ else:
 
 SUDO_EVENT_FILTER = re.compile('sudo')
 
-TITLE = 'SUDO EVENT: {0} [{1}]'
-BODY = '{0}\n@ {1}'
+TITLE = 'SUDO EVENT: {user} [{tty}]'
+BODY = '{command}\n@ {pwd}'
+
+EXCLUDE_LINES = ('/usr/sbin/lsof +c 0',)  # dont alert on sudo events that contain these strings
+
 
 def parse(line, source=None):
-    if SUDO_EVENT_FILTER.findall(line) and '/usr/sbin/lsof +c 0' not in line and 'COMMAND' in line:
+    if SUDO_EVENT_FILTER.findall(line) and 'COMMAND' in line and not any(pattern in line for pattern in EXCLUDE_LINES) :
         pre, pwd, _, command = line.split(' ; ', 3)
 
         user = pre.split(' : ', 1)[0].split(' ')[-1]
@@ -22,7 +25,7 @@ def parse(line, source=None):
         pwd = pwd.split('PWD=', 1)[-1].split(pwd_split, 1)[-1]
 
         return ('alert',
-            TITLE.format(user, tty),
-            BODY.format(command, pwd))
+            TITLE.format(user=user, tty=tty),
+            BODY.format(command=command, pwd=pwd))
 
     return (None, '', '')

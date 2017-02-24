@@ -13,13 +13,15 @@ FAIL_EVENT_FILTER = re.compile(' sshd\[\d+\]: ')
 
 
 def word_after(line, word):
+    """'a black sheep', 'black' -> 'sheep'"""
     return line.split(word, 1)[-1].split(' ', 1)[0]
 
 def parse_summary(line):
-    # truncated error msg
+    """get the summary of an SSH failure from an SSH log event line"""
     return line.split(' sshd[', 1)[-1].split(' ', 1)[-1][:40] + '...'
 
 def parse_line(line):
+    """parse out the user and connection source from an SSH log event line"""
     user = (
         word_after(line, ' for ')
         if ' for ' in line else ' '

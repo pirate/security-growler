@@ -40,6 +40,13 @@ Python() {
 [[ $1 == "Settings..."* || $1 == *" Started Watching Sources"* || $1 == "port "* ]] &&
     Open "$DIR"/settings.py
 
+[[ $1 == "Check for updates" ]] &&
+    open "https://github.com/pirate/security-growler/releases"
+
+# once sc auto-starts on launch instead of requiring a click on the menu icon
+# [[ $1 == "Start Security Growler at login" ]] &&
+    # defaults write loginwindow AutoLaunchedApplicationDictionary -array-add '{ "Path" = "/Applications/Security Growler.app"; "Hide" = 0; }'
+
 [[ $1 == "View the full log..."* ]] &&
     Open $OUTFILE
 
@@ -49,7 +56,7 @@ Python() {
 [[ $1 == "Stop the background agent"* ]] &&
     echo `date +"[%m/%d %H:%M]"` "Stopped." >> $OUTFILE &&
     kill `ps aux | grep 'growler\.py' | awk '{print $2}'` &&
-    kill `ps aux | grep 'Security Growler\.app' | awk '{print $2}'` &&
+    kill `ps aux | grep 'Security Growler' | awk '{print $2}'` &&
     exit 0
 
 [[ $1 == " my website: "* ]] &&
@@ -61,8 +68,8 @@ Python() {
 [[ $1 == " information: "* || $1 == "About Security Growler" ]] &&
     Open 'https://pirate.github.io/security-growler/'
 
-[[ $1 == " support: "* || $1 == "Request a Feature" ]] &&
-    Open 'https://github.com/pirate/security-growler/issues'
+[[ $1 == " support: "* || $1 == "Request a feature" ]] &&
+    open 'https://github.com/pirate/security-growler/issues'
 
 # Helpful logfile line actions
 [[ $1 == *" VNC "* || $1 == *" PORT "* ]] &&
@@ -84,9 +91,11 @@ then
     echo "—————————————————————————————————————————————————————————"
     sed -n 'H; / --------$/h; ${g;p;}' $OUTFILE | tail +2 | tail -30
     echo "—————————————————————————————————————————————————————————"
-    echo "Request a Feature"
+    echo "Check for updates"
+    echo "Request a feature"
     echo "About Security Growler"
-    echo "Stop the background agent & Quit"
+    # echo "Start Security Growler at login"
+    echo "Stop the background agent & quit"
 
 # Otherwise start it and display the loading output
 else
