@@ -8,7 +8,7 @@ This menubar app for OS X will notify you via Notification Center (or Growl) whe
 It's very useful if you're paranoid about people trying to hack into your computer.  Or... if you simply like having information about people using your computer's resources.
 
 It's extremely lightweight, the app is 3MB including the icon, with <0.01% CPU and <15MB of RAM used when running.
-It's easily extensible in Python, you can add parsers that detect new TCP connetions or poll logfiles.
+It's easily extensible in Python, you can add parsers that detect new TCP connections or poll logfiles.
 You can even forward alerts as push notifications to your iOS devices using [Prowl](http://prowlapp.com/).
 
 ## Install:
@@ -27,7 +27,7 @@ limited use, and would very few security assurances if it could only alert on so
 
 ## It can do cool things like:
 
-**Alert you of attempted and succesfull SSH logins:**
+**Alert you of attempted and successful SSH logins:**
 
 <img src="http://pirate.github.io/security-growler/screenshots/ssh_fail_event.PNG" width="40%"/>
 <img src="http://pirate.github.io/security-growler/screenshots/ssh_key_event.PNG" width="40%"/>
@@ -72,7 +72,7 @@ TODO:
 
 ### Config:
 
-Settings are changed by editing a text file `settings.py`, accesible via the menubar dropdown item 'Settings...'.
+Settings are changed by editing a text file `settings.py`, accessible via the menubar dropdown item 'Settings...'.
 
 **To enable or disable alert types:**
 
@@ -88,7 +88,7 @@ WATCHED_SOURCES = {
 }
 ```
 
-**To enable or disable alert methods, such as Notifcation Center or Growl:**
+**To enable or disable alert methods, such as Notification Center or Growl:**
 
 Change the `LOGGERS` section to suit your needs.
 
@@ -150,7 +150,7 @@ I was tired of not being able to find an app that would quell my paranoia about 
 
 [Little Snitch](https://www.obdev.at/products/littlesnitch/index.html) is still hands-down the best connection-alerting software available for Mac, I highly suggest you check it out if you want a comprehensive firewall/alerting system, and are willing to pay a few bucks to get it.  Security Growler is centered around parsing logfiles for any kind of generic pattern, not just monitoring the TCP connection table like Little Snitch.  For example, my app can alert you of `sudo` events, keychain auth events, and anything else you can think of that's reported to a logfile.  This app is significantly more lightweight than Little Snitch, it comes in at <15mb of RAM used, because it aims to solve a simpler problem than Little Snitch.  This app is not designed to *prevent* malicious connections, that's what firewalls are for, it's just meant to keep an unobtrusive log, and alert you whenever important security events are happening.  The more informed you are, the better you can protect yourself.
 
-This app is meant for developers who frequenly run services that are open to their LAN, and just want to keep tabs on usage to make sure they aren't being abused by some local script kiddie.  Since the target audience is developers, I opted to leave some parts a little less user-friendly, such as the `settings.py` config system.  It's also just plain fun to enable lots of alerts types if you like to see every little detail of your computer's operation.
+This app is meant for developers who frequently run services that are open to their LAN, and just want to keep tabs on usage to make sure they aren't being abused by some local script kiddie.  Since the target audience is developers, I opted to leave some parts a little less user-friendly, such as the `settings.py` config system.  It's also just plain fun to enable lots of alerts types if you like to see every little detail of your computer's operation.
 
 Feel free to submit a [pull-request](https://github.com/pirate/security-growler/pulls) and add a [new parser](https://github.com/pirate/security-growler/blob/master/parsers/vnc.py) (e.g. try writing one for nginx http-auth)!
 
