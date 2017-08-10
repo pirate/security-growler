@@ -1,5 +1,18 @@
 # [Security Growler](https://pirate.github.io/security-growler)  <img src="https://pirate.github.io/security-growler/alert.png" height="20px"/>  [![Github Stars](https://img.shields.io/github/stars/pirate/security-growler.svg)](https://github.com/pirate/security-growler) [![Twitter URL](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/thesquashSH)
 
+**Development is temporarily on hold, check out these alternatives in the meantime:**
+
+  - [Little Snitch](https://www.obdev.at/products/littlesnitch/index.html) ⭐️
+  - [Radio Silence](https://radiosilenceapp.com/) ⭐️
+  - [HandsOff](https://www.macupdate.com/app/mac/35277/hands-off)
+  - [Marus](http://www.murusfirewall.com/)
+  - [Private Eye](https://radiosilenceapp.com/private-eye)
+  - [TCPBlock](https://www.macupdate.com/app/mac/35914/tcpblock)
+  
+**I have a refactor in-progress to fix Security Growler for macOS Sierra using Bitbar, but I'm too busy to finish it at the moment.**
+
+---
+
 This menubar app for OS X will notify you via Notification Center (or Growl) when various security events occur ([see list](https://github.com/pirate/security-growler#documentation)).
 
 <img src="http://pirate.github.io/security-growler/screenshots/portscan_event.PNG" width="45%"/>
