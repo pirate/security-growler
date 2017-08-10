@@ -1,0 +1,6 @@
+import os
+
+NAME = "Speak Alerts"
+
+def alert(title, body, level='INFO', time=None):
+    os.Popen(['say', title], shell=False)

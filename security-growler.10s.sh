@@ -10,19 +10,18 @@
 export PATH="/usr/local/bin:/usr/bin:$PATH"
 
 
-growler_bin=~/Documents/Code/security-growler/growler.py
 OUTFILE=~/Library/Logs/SecurityGrowler.log
+SETTINGS=~/Library/Preferences/com.squash.security-growler.json
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+GROWLER_BIN="$DIR/growler.py"
+PID=$(ps ax | grep -v grep | grep growler\.py | awk '{print $1}')
 
+alerts="‼️"
 
-
-
-pid=$(ps ax | grep -v grep | grep growler\.py | awk '{print $1}')
-
-
-if [[ $pid ]]; then
+if [[ $PID ]]; then
 
 # Agent is Running
-echo "📡 ‼️ | color=red"
+echo "📡 $alerts | color=red"
 echo "---"
 echo "✓ Notifications On | bash=/usr/bin/true terminal=false"
 echo "𐄂  Menubar Summary Off | bash=/usr/bin/true terminal=false"
@@ -35,10 +34,10 @@ echo "---"
 else
 
 # Agent is stopped
-echo "🛰"
+echo "⭕️"
 echo "---"
 echo "Monitoring is off"
-[[ $pid ]] || echo "Start Monitoring ↠ | bash=python param1=\"$growler_bin\" terminal=false"
+[[ $PID ]] || echo "📡 Start Monitoring | bash=python param1=\"$GROWLER_BIN\" terminal=false"
 echo "---"
 echo "See full log... | bash=/usr/bin/open param1=$OUTFILE terminal=false"
 
@@ -67,6 +66,6 @@ echo "-- Check for Updates | href=https://github.com/pirate/security-growler/rel
 echo "-- 🍺 Donate if you like it | href=https://twitter.com/thesquashSH"
 echo "-- 🍀 Tweet @thesquashSH | href=https://twitter.com/thesquashSH"
 
-[[ $pid ]] && echo "⚙ Advanced Settings | bash=/usr/bin/open param1=~/.security-growler.conf terminal=false"
-[[ $pid ]] && echo ":red_circle: Stop Monitoring | bash=/bin/bash param1=-c param2=\"kill $pid && kill $$\" terminal=false"
+[[ $PID ]] && echo "⚙ Advanced Settings | bash=/usr/bin/open param1=~/.security-growler.conf terminal=false"
+[[ $PID ]] && echo ":red_circle: Stop Monitoring | bash=/bin/bash param1=-c param2=\"kill $PID && kill $$\" terminal=false"
 

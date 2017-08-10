@@ -1,83 +1,101 @@
 #!/bin/bash
+#
+# <bitbar.title>Security Growler</bitbar.title>
+# <bitbar.version>v3.6</bitbar.version>
+# <bitbar.author>Nick Sweeting</bitbar.author>
+# <bitbar.author.github>pirate</bitbar.author.github>
+# <bitbar.desc>See pirate.github.io/security-growler</bitbar.desc>
+# <bitbar.dependencies>security growler</bitbar.dependencies>
 
-SERVICE=growler.py
-OUTFILE=~/Library/Logs/SecurityGrowler.log
+export PATH="/usr/local/bin:/usr/bin:/bin$PATH"
+
+[[ -e .running ]] && ON=1 || ON=""
+
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-# Menu-item actions
-[[ $1 == "Settings..."* || $1 == *" Started Watching Sources"* || $1 == "port "* ]] &&
-    open "$DIR"/settings.py
+LOGGERS="/Users/squash/Documents/Code/security-growler/loggers"
+MONITORS="/Users/squash/Documents/Code/security-growler/monitors"
 
-[[ $1 == "Check for updates" ]] &&
-    open "https://github.com/pirate/security-growler/releases"
+BITBAR_FILE="/Users/squash/Documents/Code/security-growler/menubar.sh"
 
-# once sc auto-starts on launch instead of requiring a click on the menu icon
-# [[ $1 == "Start Security Growler at login" ]] &&
-    # defaults write loginwindow AutoLaunchedApplicationDictionary -array-add '{ "Path" = "/Applications/Security Growler.app"; "Hide" = 0; }'
+GROWLER_BIN=/Users/squash/Documents/Code/security-growler/growler.py
+OUTFILE=/Users/squash/Library/Logs/SecurityGrowler.log
 
-[[ $1 == "View the full log..."* ]] &&
-    open $OUTFILE
+cd /Users/squash/Documents/Code/security-growler
 
-[[ $1 == "Clear"* ]] &&
-    echo `date +"[%m/%d %H:%M]"` "--------" >> $OUTFILE
+if test -e $DIR/.running; then
 
-[[ $1 == "Stop the background agent"* ]] &&
-    echo `date +"[%m/%d %H:%M]"` "Stopped." >> $OUTFILE &&
-    kill `ps aux | grep 'growler\.py' | awk '{print $2}'` &&
-    kill `ps aux | grep 'Security Growler' | awk '{print $2}'` &&
-    exit 0
+    echo "📡"
+    echo "---"
+    echo "Monitoring is on | color=green"
 
-[[ $1 == " my website: "* ]] &&
-    open 'https://nicksweeting.com'
+    python2.7 $GROWLER_BIN >> $OUTFILE
 
-[[ $1 == *"@thesquashSH"* ]] &&
-    open 'https://twitter.com/thesquashSH'
-
-[[ $1 == " information: "* || $1 == "About Security Growler" ]] &&
-    open 'https://pirate.github.io/security-growler/'
-
-[[ $1 == " support: "* || $1 == "Request a feature" ]] &&
-    open 'https://github.com/pirate/security-growler/issues'
-
-# Helpful logfile line actions
-[[ $1 == *" VNC "* || $1 == *" PORT "* ]] &&
-    open '/System/Library/PreferencePanes/SharingPref.prefPane'
-
-[[ $1 == *" SUDO "* ]] &&
-    open '/Applications/Utilities/Activity Monitor.app'
-
-[[ $1 == "/var/log/"* ]] &&
-    open /var/log/
-
-
-# Growler is already running, display its output
-if ps ax | grep -v grep | grep $SERVICE > /dev/null
-then
-    echo "Settings..."
-    echo "Clear menubar log"
-    echo "View the full log..."
-    echo "—————————————————————————————————————————————————————————"
-    sed -n 'H; / --------$/h; ${g;p;}' $OUTFILE | tail +2 | tail -30
-    echo "—————————————————————————————————————————————————————————"
-    echo "Check for updates"
-    echo "Request a feature"
-    echo "About Security Growler"
-    # echo "Start Security Growler at login"
-    echo "Stop the background agent & quit"
-
-# Otherwise start it and display the loading output
 else
-    echo `date +"[%m/%d %H:%M]"` "--------" >> $OUTFILE
-    echo "               🍺      Starting...      🍺"
-    echo " "
-    echo " information:  pirate.github.io/security-growler"
-    echo " support:      github.com/pirate/security-growler/issues"
-    echo " my website:   nicksweeting.com"
-    echo " "
-    echo "   🍀   Tweet @thesquashSH if you like this app!    🍀  "
-
-    # run Growler in the background and save its output to OUTFILE
-    python "$DIR"/"$SERVICE" 2>&1>> $OUTFILE &
+    echo "🛰"
+    echo "---"
+    echo "Monitoring is off | color=red"
 fi
 
-sleep 0.1  # small delay to allow menubar to buffer text before rendering
+echo "Toggle events to monitor"
+for filename in $MONITORS/*.py; do
+    base=$(basename "$filename" | replace '.py' '')
+    echo "$base" | grep '_.*' > /dev/null && continue
+    name=$(grep 'NAME = ' "$filename" | replace 'NAME = ' '' | replace '"' '')
+    [[ "$name" ]] || name=$base
+    echo "-- ✓ $name | color=#33ff33 | bash=/bin/mv param1=$filename param2=${filename}.disabled terminal=false refresh=true"
+done
+stat -t $MONITORS/*.py.disabled >/dev/null 2>&1 &&
+for filename in $MONITORS/*.py.disabled; do
+    base=$(basename "$filename" | replace '.py.disabled' '')
+    echo "$base" | grep '_.*' > /dev/null && continue
+    name=$(grep 'NAME = ' "$filename" | replace 'NAME = ' '' | replace '"' '')
+    [[ "$name" ]] || name=$base
+    enabled=$(echo "$filename" | replace '.py.disabled' '.py')
+    echo "-- ⅹ $name | color=#ff3333 | bash=/bin/mv param1=$filename param2=$enabled terminal=false refresh=true"
+done
+echo "-- Add new monitor type... | bash=/usr/bin/open param1=monitors terminal=false"
+
+
+
+echo "---"
+echo "Recent Events"
+tail -8 "$OUTFILE" | replace "|" "" | uniq   # replace | to mitigate bitbar "xss"
+echo "View logfile... | bash=/usr/bin/open param1=$OUTFILE terminal=false"
+echo "Clear recent events | bash=/bin/bash param1=-c param2=\"'cat $OUTFILE >> ${OUTFILE}.old && echo $(date +"[%H:%M %p]") Cleared > $OUTFILE'\" terminal=false refresh=True"
+echo "---"
+
+echo ":speaker: Notifications"
+for filename in $LOGGERS/*.py; do
+    base=$(basename "$filename" | replace '.py' '')
+    echo "$base" | grep '_.*' > /dev/null && continue
+    name=$(grep 'NAME = ' "$filename" | replace 'NAME = ' '' | replace '"' '')
+    [[ "$name" ]] || name=$base
+    echo "-- ✓ $name | color=green | bash=/bin/mv param1=$filename param2=${filename}.disabled terminal=false refresh=true"
+done
+stat -t $LOGGERS/*.py.disabled >/dev/null 2>&1 &&
+for filename in $LOGGERS/*.py.disabled; do
+    base=$(basename "$filename" | replace '.py.disabled' '')
+    echo "$base" | grep '_.*' > /dev/null && continue
+    name=$(grep 'NAME = ' "$filename" | replace 'NAME = ' '' | replace '"' '')
+    [[ "$name" ]] || name=$base
+    enabled=$(echo "$filename" | replace '.py.disabled' '.py')
+    echo "-- ⅹ $name | color=red | bash=/bin/mv param1=$filename param2=$enabled terminal=false refresh=true"
+done
+echo "-- Add new alert type... | bash=/usr/bin/open param1=loggers terminal=false"
+
+
+echo ":computer: More info"
+echo "-- Website & Docs | href=http://pirate.github.io/security-growler"
+echo "-- Check for Updates | href=https://github.com/pirate/security-growler/releases"
+echo "-- How to respond to alerts | href=https://github.com/pirate/security-growler#how-should-you-respond-to-alerts"
+echo "-- API for writing custom alerts | href=https://github.com/pirate/security-growler#developer-info"
+# echo "-- 🍺 Donate if you like it | href=https://twitter.com/thesquashSH"
+echo "-- 🍀 Tweet @thesquashSH | href=https://twitter.com/thesquashSH"
+
+echo "📦 View archived logs | bash=/usr/bin/open param1=${OUTFILE}.old param2=-a param3=Console.app terminal=false tooltip=${OUTFILE}.old"
+echo "---"
+# echo "⚙ View advanced settings | bash=/usr/bin/open param1=~/.security-growler.conf terminal=false"
+test -e $DIR/.running && echo "Quit | bash=/bin/rm param1=$DIR/.running terminal=false refresh=true"
+test -e $DIR/.running || echo "Start monitoring | color=green bash=/usr/bin/touch param1=$DIR/.running terminal=false refresh=true"
+

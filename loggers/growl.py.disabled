@@ -1,6 +1,4 @@
-"""Logger that outputs notifications to growl"""
-
-from time import sleep
+NAME = "Growl"
 
 try:
     import gntp
@@ -8,22 +6,6 @@ try:
 except ImportError:
     raise Exception('Please `pip install gntp` if you want to use Growl.')
 
-from settings import (
-    APP_NAME,
-    NOTIFICATION_TYPES,
-
-    INFO_TYPE,
-    INFO_ICON,
-    INFO_TITLE,
-    INFO_STICKY,
-    INFO_PRIORITY,
-
-    ALERT_TYPE,
-    ALERT_ICON,
-    ALERT_TITLE,
-    ALERT_STICKY,
-    ALERT_PRIORITY,
-)
 
 # Register the app with growl and check that it works
 GROWL = gntp.notifier.GrowlNotifier(
@@ -40,13 +22,22 @@ if not success:
     raise Exception("gntp installed but no Growl app (>2.0v) found.")
 
 
+def alert(level, title, body, time=None):
+    time = (time or datetime.datetime.now()).strftime('%H:%M')
+
+    if level == 'WARNING':
+        warn(title=title, body=body)
+    else:
+        info(title=title, body=body)
+
+
 ### Exported functions for use in the app
-def notify(content, title=INFO_TITLE, icon=INFO_ICON):
+def info(title=INFO_TITLE, body, icon=INFO_ICON):
     try:
         GROWL.notify(
             noteType=INFO_TYPE,
             title=title,
-            description=content,
+            description=body,
             icon=icon,
             sticky=INFO_STICKY,
             priority=INFO_PRIORITY,
@@ -55,12 +46,12 @@ def notify(content, title=INFO_TITLE, icon=INFO_ICON):
         pass
 
 
-def alert(content, title=ALERT_TITLE, icon=ALERT_ICON):
+def warn(title=ALERT_TITLE, body, icon=ALERT_ICON):
     try:
         GROWL.notify(
             noteType=ALERT_TYPE,
             title=title,
-            description=content,
+            description=body,
             icon=icon,
             sticky=ALERT_STICKY,
             priority=ALERT_PRIORITY,
