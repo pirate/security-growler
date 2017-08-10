@@ -1,4 +1,4 @@
-NAME = "Notification Center"
+"""Logger that outputs notifications to OS X Notification Center"""
 
 try:
     from Foundation import NSUserNotification, NSUserNotificationCenter
@@ -7,31 +7,31 @@ except ImportError:
 
 import datetime
 
+from settings import (
+    INFO_TITLE,
+    INFO_SOUND,
+    ALERT_TITLE,
+    ALERT_SOUND,
+)
 
-def alert(title, body, level='INFO', time=None):
-    time = (time or datetime.datetime.now()).strftime('%H:%M')
-
-    if level == 'WARNING':
-        warn(title=title, body=body, time=time)
-    else:
-        info(title=title, body=body, time=time)
-
-
+def timestamp():
+    return datetime.datetime.now().strftime('%H:%M')
 
 NOTIFICATION_CENTER = NSUserNotificationCenter.defaultUserNotificationCenter()
 
-def info(title, body, time, sound=False):
+### Exported functions for use in the app
+def notify(content, title=INFO_TITLE, icon=None, sound=INFO_SOUND):
     notification = NSUserNotification.alloc().init()
-    notification.setTitle_('{0} @ {1}'.format(title, time))
-    notification.setInformativeText_(body)
+    notification.setTitle_('{0} @ {1}'.format(title, timestamp()))
+    notification.setInformativeText_(content)
     if sound:
         notification.setSoundName_('NSUserNotificationDefaultSoundName')
     NOTIFICATION_CENTER.deliverNotification_(notification)
 
-def warn(title, body, time, sound=False):
+def alert(content, title=ALERT_TITLE, icon=None, sound=ALERT_SOUND):
     notification = NSUserNotification.alloc().init()
-    notification.setTitle_('{0} @ {1}'.format(title, time))
-    notification.setInformativeText_(body)
+    notification.setTitle_('{0} @ {1}'.format(title, timestamp()))
+    notification.setInformativeText_(content)
     if sound:
         notification.setSoundName_('NSUserNotificationDefaultSoundName')
     NOTIFICATION_CENTER.deliverNotification_(notification)
