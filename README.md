@@ -2,12 +2,12 @@
 
 **Development is temporarily on hold, check out these alternatives in the meantime:**
 
-  - [Little Snitch](https://www.obdev.at/products/littlesnitch/index.html) ⭐️
-  - [Radio Silence](https://radiosilenceapp.com/) ⭐️
-  - [HandsOff](https://www.macupdate.com/app/mac/35277/hands-off)
-  - [Marus](http://www.murusfirewall.com/)
-  - [Private Eye](https://radiosilenceapp.com/private-eye)
-  - [TCPBlock](https://www.macupdate.com/app/mac/35914/tcpblock)
+ -  ⭐️ [Little Snitch](https://www.obdev.at/products/littlesnitch/index.html)
+ -  ⭐️ [Radio Silence](https://radiosilenceapp.com/)
+ - [HandsOff](https://www.macupdate.com/app/mac/35277/hands-off)
+ - [Marus](http://www.murusfirewall.com/)
+ - [Private Eye](https://radiosilenceapp.com/private-eye)
+ - [TCPBlock](https://www.macupdate.com/app/mac/35914/tcpblock)
   
 **I have a refactor in-progress to fix Security Growler for macOS Sierra using Bitbar, but I'm too busy to finish it at the moment.**
 
