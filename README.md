@@ -2,6 +2,7 @@
 
 **Development is temporarily on hold, check out these alternatives in the meantime:**
 
+ -  ⭐️ [Lulu](https://objective-see.com/products/lulu.html)
  -  ⭐️ [Little Snitch](https://www.obdev.at/products/littlesnitch/index.html)
  -  ⭐️ [Radio Silence](https://radiosilenceapp.com/)
  - [HandsOff](https://www.macupdate.com/app/mac/35277/hands-off)
