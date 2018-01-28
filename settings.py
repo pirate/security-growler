@@ -1,6 +1,7 @@
 """Setup and defaults for Security Growler app"""
 
 from os.path import expanduser, isfile
+from sys import platform as _platform
 
 APP_NAME = 'Security Growler'
 
@@ -14,22 +15,34 @@ WATCHED_SOURCES = {
     3306: 'connections',    # MySQL
     5432: 'connections',    # PostgreSQL
     5900: 'vnc',            # VNC
-    '/var/log/system.log': ('sudo', 'ssh', 'portscan', 'ostiarius'),
 }
+
+if _platform == "Darwin":
+    WATCHED_SOURCES['/var/log/system.log'] = ('sudo', 'ssh', 'portscan', 'ostiarius')
+else:
+    WATCHED_SOURCES['systemd'] = ('sudo', 'ssh')
 
 # Enabled output/display methods
 LOGGERS = [
     'stdout',
     'logfile',
-    'osxnotifications',
     # 'growl',
 ]
+
+if _platform == "Darwin":
+    LOGGERS.append('osxnotifications')
+else:
+    LOGGERS.append('gnomenotifications')
 
 # Delay in seconds between logfile checks
 POLLING_SPEED = 2
 
 # File logger output settings
-EVENT_LOGFILE = expanduser('~/Library/Logs/SecurityGrowler.log')
+EVENT_LOGFILE = None
+if _platform == "Darwin":
+    EVENT_LOGFILE = expanduser('~/Library/Logs/SecurityGrowler.log')
+else:
+    EVENT_LOGFILE = expanduser('~/.logs/SecurityGrowler.log')
 
 # Growl/OSX notification display settings
 INFO_TYPE = 'secnotify'
@@ -53,5 +66,5 @@ NOTIFICATION_TYPES = [INFO_TYPE, ALERT_TYPE]
 ### DO NOT MODIFY BELOW THIS LINE ###
 WATCHED_SOURCES = {
     source: parsers for source, parsers in WATCHED_SOURCES.items()
-    if type(source) == int or isfile(source)
+    if type(source) == int or isfile(source) or source == 'systemd'
 }

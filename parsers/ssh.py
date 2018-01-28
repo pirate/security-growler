@@ -1,10 +1,10 @@
 import re
 
 # Apr 20 00:05:01 squash sshd[58113]: Accepted keyboard-interactive/pam for squash from fe80::82e6:50ff:fe16:b2dc%en0 port 54978 ssh2
-PASSWORD_EVENT_FILTER = re.compile(' sshd\[\d+\]: Accepted keyboard')
+PASSWORD_EVENT_FILTER = re.compile('sshd(\[\d+\])?: Accepted (keyboard|password)')
 
 # Apr 19 23:42:17 squash sshd[10906]: Accepted publickey for root from ::1 port 54336 ssh2: RSA SHA256:ZzsSwM7Qcrk/QkE2pSJj8Bkb7L91bp3deUpo0wQ9uBg
-KEYAUTH_EVENT_FILTER = re.compile(' sshd\[\d+\]: Accepted publickey for ')
+KEYAUTH_EVENT_FILTER = re.compile('sshd\[\d+\]: Accepted publickey for ')
 
 # Apr 20 00:27:16 squash sshd[88153]: error: PAM: authentication error for squash from fe80::82e6:50ff:fe16:b2dc%en0 via fe80::82e6:50ff:fe16:b2dc%en0
 # Apr 20 00:57:47 squash sshd[40882]: Postponed keyboard-interactive for squash from 192.168.2.52 port 56316 ssh2 [preauth]
@@ -41,7 +41,7 @@ def parse(line, source=None):
     if KEYAUTH_EVENT_FILTER.findall(line) or PASSWORD_EVENT_FILTER.findall(line):
         user, src = parse_line(line)
         title = 'SSH LOGIN SUCCESS: %s' % user
-        method = 'Password' if ' keyboard' in line else 'Public Key'
+        method = 'Password' if ' keyboard' or ' password' in line else 'Public Key'
         body = 'from: %s using a %s' % (src, method)
 
 
