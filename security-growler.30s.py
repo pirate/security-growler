@@ -20,6 +20,13 @@ port scans, network connections, and more using the unified logging system.
 <xbar.var>boolean(MONITOR_VNC=true): Monitor VNC connections</xbar.var>
 <xbar.var>boolean(MONITOR_PORTS=true): Monitor network port connections</xbar.var>
 <xbar.var>string(MONITORED_PORTS="21,445,548,3306,3689,5432"): Comma-separated ports to monitor</xbar.var>
+<xbar.var>boolean(MONITOR_LISTENING=true): Monitor new listening ports (21-9999)</xbar.var>
+<xbar.var>boolean(MONITOR_DOTENV=true): Monitor new .env files in home directory</xbar.var>
+<xbar.var>boolean(MONITOR_DANGEROUS_COMMANDS=true): Monitor npx, uvx, op commands</xbar.var>
+<xbar.var>boolean(MONITOR_DNS=true): Monitor DNS resolver changes</xbar.var>
+<xbar.var>boolean(MONITOR_PUBLIC_IP=true): Monitor public IP address changes</xbar.var>
+<xbar.var>boolean(MONITOR_LOCAL_IP=true): Monitor local IP address changes</xbar.var>
+<xbar.var>boolean(MONITOR_MDM=true): Monitor Kandji/MDM events</xbar.var>
 """
 
 import os
@@ -54,6 +61,20 @@ MONITOR_PORTSCAN = os.environ.get("MONITOR_PORTSCAN", "true").lower() == "true"
 MONITOR_VNC = os.environ.get("MONITOR_VNC", "true").lower() == "true"
 MONITOR_PORTS = os.environ.get("MONITOR_PORTS", "true").lower() == "true"
 MONITORED_PORTS = os.environ.get("MONITORED_PORTS", "21,445,548,3306,3689,5432")
+MONITOR_LISTENING = os.environ.get("MONITOR_LISTENING", "true").lower() == "true"
+MONITOR_DOTENV = os.environ.get("MONITOR_DOTENV", "true").lower() == "true"
+MONITOR_DANGEROUS_COMMANDS = os.environ.get("MONITOR_DANGEROUS_COMMANDS", "true").lower() == "true"
+MONITOR_DNS = os.environ.get("MONITOR_DNS", "true").lower() == "true"
+MONITOR_PUBLIC_IP = os.environ.get("MONITOR_PUBLIC_IP", "true").lower() == "true"
+MONITOR_LOCAL_IP = os.environ.get("MONITOR_LOCAL_IP", "true").lower() == "true"
+MONITOR_MDM = os.environ.get("MONITOR_MDM", "true").lower() == "true"
+
+# Listening port range to monitor
+LISTENING_PORT_MIN = 21
+LISTENING_PORT_MAX = 9999
+
+# Dangerous commands to monitor
+DANGEROUS_COMMANDS = ["npx", "uvx", "op"]
 
 # Parse monitored ports
 PORTS_TO_MONITOR = [int(p.strip()) for p in MONITORED_PORTS.split(",") if p.strip().isdigit()]
@@ -575,6 +596,396 @@ def parse_vnc_events(state: Dict[str, Any]) -> List[Tuple[str, str, str]]:
 
 
 # =============================================================================
+# New Listening Ports Monitor
+# =============================================================================
+
+def get_listening_ports() -> Dict[int, Dict[str, str]]:
+    """Get all listening ports and their processes using lsof."""
+    cmd = "lsof -i -P -n 2>/dev/null | grep LISTEN"
+
+    try:
+        result = subprocess.run(
+            cmd,
+            shell=True,
+            capture_output=True,
+            text=True,
+            timeout=15
+        )
+
+        listening = {}
+        for line in result.stdout.strip().splitlines():
+            parts = line.split()
+            if len(parts) >= 9:
+                process = parts[0]
+                pid = parts[1]
+                user = parts[2]
+                name = parts[-2] if parts[-1] == "(LISTEN)" else parts[-1]
+
+                # Extract port from name (e.g., "*:8080" or "127.0.0.1:3000")
+                if ":" in name:
+                    port_str = name.rsplit(":", 1)[-1]
+                    try:
+                        port = int(port_str)
+                        if LISTENING_PORT_MIN < port < LISTENING_PORT_MAX:
+                            listening[port] = {
+                                "process": process,
+                                "pid": pid,
+                                "user": user,
+                                "address": name,
+                            }
+                    except ValueError:
+                        continue
+
+        return listening
+
+    except (subprocess.TimeoutExpired, subprocess.SubprocessError):
+        return {}
+
+
+def parse_listening_port_events(state: Dict[str, Any]) -> List[Tuple[str, str, str]]:
+    """Monitor for new listening ports."""
+    if not MONITOR_LISTENING:
+        return []
+
+    events = []
+    known_listening = set(state.get("known_listening_ports", []))
+    current_listening = get_listening_ports()
+
+    for port, info in current_listening.items():
+        if port not in known_listening:
+            title = f"NEW LISTENING PORT: {port}"
+            body = f"{info['user']} {info['process']} (PID {info['pid']}) on {info['address']}"
+            events.append(("alert", title, body))
+
+    # Update known listening ports
+    state["known_listening_ports"] = list(current_listening.keys())
+    return events
+
+
+# =============================================================================
+# .env File Monitor (using Spotlight/mdfind)
+# =============================================================================
+
+def find_recent_dotenv_files() -> List[str]:
+    """Find .env files modified in the last 2 minutes using Spotlight, excluding ~/Library."""
+    home = str(Path.home())
+    library = str(Path.home() / "Library")
+
+    # Use mdfind (Spotlight) to find .env files modified recently
+    # kMDItemFSName == "*.env" finds files ending in .env
+    # kMDItemContentModificationDate >= $time.now(-120) finds files modified in last 2 minutes
+    cmd = f'''mdfind -onlyin "{home}" '(kMDItemFSName == "*.env" || kMDItemFSName == ".env") && kMDItemContentModificationDate >= $time.now(-120)' 2>/dev/null'''
+
+    try:
+        result = subprocess.run(
+            cmd,
+            shell=True,
+            capture_output=True,
+            text=True,
+            timeout=10
+        )
+
+        files = []
+        for line in result.stdout.strip().splitlines():
+            path = line.strip()
+            # Exclude ~/Library
+            if path and not path.startswith(library):
+                files.append(path)
+
+        return files
+
+    except (subprocess.TimeoutExpired, subprocess.SubprocessError):
+        return []
+
+
+def parse_dotenv_events(state: Dict[str, Any]) -> List[Tuple[str, str, str]]:
+    """Monitor for new .env files in home directory."""
+    if not MONITOR_DOTENV:
+        return []
+
+    events = []
+    known_dotenv = set(state.get("known_dotenv_files", []))
+    current_dotenv = find_recent_dotenv_files()
+
+    for filepath in current_dotenv:
+        if filepath not in known_dotenv:
+            # Get relative path from home
+            try:
+                rel_path = str(Path(filepath).relative_to(Path.home()))
+            except ValueError:
+                rel_path = filepath
+
+            title = "NEW .ENV FILE"
+            body = f"~/{rel_path}"
+            events.append(("alert", title, body))
+            known_dotenv.add(filepath)
+
+    state["known_dotenv_files"] = list(known_dotenv)
+    return events
+
+
+# =============================================================================
+# Dangerous Commands Monitor (npx, uvx, op)
+# =============================================================================
+
+def parse_dangerous_command_events(state: Dict[str, Any]) -> List[Tuple[str, str, str]]:
+    """Monitor for npx, uvx, op command execution."""
+    if not MONITOR_DANGEROUS_COMMANDS:
+        return []
+
+    events = []
+
+    # Build predicate for dangerous commands
+    command_predicates = " OR ".join(
+        f'(process == "{cmd}")' for cmd in DANGEROUS_COMMANDS
+    )
+    predicate = f'({command_predicates})'
+
+    entries = get_log_entries(predicate)
+
+    for entry in entries:
+        event_id = entry.get("eventID", entry.get("traceID", str(entry)))
+        if event_id in state["seen_events"]:
+            continue
+
+        process = entry.get("process", "unknown")
+        message = entry.get("eventMessage", "")
+        sender = entry.get("sender", "")
+
+        # Get additional context
+        title = f"COMMAND: {process}"
+        body = message[:60] + "..." if len(message) > 60 else message
+        if not body:
+            body = f"executed by {sender}" if sender else "command executed"
+
+        events.append(("alert", title, body))
+        state["seen_events"].append(event_id)
+
+    return events
+
+
+# =============================================================================
+# DNS Resolver Monitor
+# =============================================================================
+
+def get_dns_resolvers() -> List[str]:
+    """Get current DNS resolver addresses using scutil."""
+    cmd = "scutil --dns 2>/dev/null | grep 'nameserver\\[' | awk '{print $3}' | sort -u"
+
+    try:
+        result = subprocess.run(
+            cmd,
+            shell=True,
+            capture_output=True,
+            text=True,
+            timeout=5
+        )
+
+        resolvers = [
+            line.strip()
+            for line in result.stdout.strip().splitlines()
+            if line.strip()
+        ]
+        return resolvers
+
+    except (subprocess.TimeoutExpired, subprocess.SubprocessError):
+        return []
+
+
+def parse_dns_events(state: Dict[str, Any]) -> List[Tuple[str, str, str]]:
+    """Monitor for DNS resolver changes."""
+    if not MONITOR_DNS:
+        return []
+
+    events = []
+    known_dns = set(state.get("known_dns_resolvers", []))
+    current_dns = set(get_dns_resolvers())
+
+    # Check for changes (both additions and removals indicate a change)
+    if known_dns and current_dns != known_dns:
+        added = current_dns - known_dns
+        removed = known_dns - current_dns
+
+        if added or removed:
+            title = "DNS RESOLVERS CHANGED"
+            parts = []
+            if added:
+                parts.append(f"added: {', '.join(added)}")
+            if removed:
+                parts.append(f"removed: {', '.join(removed)}")
+            body = "; ".join(parts)
+            events.append(("alert", title, body))
+
+    # Always update to current (including first run)
+    state["known_dns_resolvers"] = list(current_dns)
+    return events
+
+
+# =============================================================================
+# Public IP Monitor
+# =============================================================================
+
+def get_public_ip() -> Optional[str]:
+    """Get public IP address using external service."""
+    # Try multiple methods
+    methods = [
+        ["curl", "--max-time", "3", "--silent", "http://whatismyip.akamai.com/"],
+        ["curl", "--max-time", "3", "--silent", "https://api.ipify.org"],
+        ["dig", "-4", "+short", "myip.opendns.com", "@resolver1.opendns.com"],
+    ]
+
+    for cmd in methods:
+        try:
+            result = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                timeout=5
+            )
+            ip = result.stdout.strip()
+            # Basic validation - should look like an IP
+            if ip and "." in ip and len(ip) <= 15:
+                return ip
+        except (subprocess.TimeoutExpired, subprocess.SubprocessError, FileNotFoundError):
+            continue
+
+    return None
+
+
+def parse_public_ip_events(state: Dict[str, Any]) -> List[Tuple[str, str, str]]:
+    """Monitor for public IP address changes."""
+    if not MONITOR_PUBLIC_IP:
+        return []
+
+    events = []
+    known_ip = state.get("known_public_ip")
+    current_ip = get_public_ip()
+
+    if current_ip and known_ip and current_ip != known_ip:
+        title = "PUBLIC IP CHANGED"
+        body = f"{known_ip} → {current_ip}"
+        events.append(("alert", title, body))
+
+    if current_ip:
+        state["known_public_ip"] = current_ip
+
+    return events
+
+
+# =============================================================================
+# Local IP Monitor
+# =============================================================================
+
+def get_local_ips() -> Dict[str, str]:
+    """Get local IP addresses for all interfaces."""
+    interfaces = ["en0", "en1", "en2", "en3", "en4", "utun0", "utun1", "utun2"]
+    ips = {}
+
+    for iface in interfaces:
+        try:
+            result = subprocess.run(
+                ["ipconfig", "getifaddr", iface],
+                capture_output=True,
+                text=True,
+                timeout=2
+            )
+            ip = result.stdout.strip()
+            if ip:
+                ips[iface] = ip
+        except (subprocess.TimeoutExpired, subprocess.SubprocessError):
+            continue
+
+    return ips
+
+
+def parse_local_ip_events(state: Dict[str, Any]) -> List[Tuple[str, str, str]]:
+    """Monitor for local IP address changes."""
+    if not MONITOR_LOCAL_IP:
+        return []
+
+    events = []
+    known_ips = state.get("known_local_ips", {})
+    current_ips = get_local_ips()
+
+    # Check for changes
+    for iface, ip in current_ips.items():
+        old_ip = known_ips.get(iface)
+        if old_ip and old_ip != ip:
+            title = f"LOCAL IP CHANGED: {iface}"
+            body = f"{old_ip} → {ip}"
+            events.append(("notify", title, body))
+
+    # Check for new interfaces
+    for iface, ip in current_ips.items():
+        if iface not in known_ips:
+            title = f"NEW INTERFACE: {iface}"
+            body = f"IP: {ip}"
+            events.append(("notify", title, body))
+
+    # Check for removed interfaces
+    for iface in known_ips:
+        if iface not in current_ips:
+            title = f"INTERFACE DOWN: {iface}"
+            body = f"was {known_ips[iface]}"
+            events.append(("notify", title, body))
+
+    state["known_local_ips"] = current_ips
+    return events
+
+
+# =============================================================================
+# Kandji/MDM Events Monitor
+# =============================================================================
+
+def parse_mdm_events(state: Dict[str, Any]) -> List[Tuple[str, str, str]]:
+    """Monitor for Kandji/MDM events."""
+    if not MONITOR_MDM:
+        return []
+
+    events = []
+
+    # Query for MDM-related processes
+    predicate = '''(
+        process == "Kandji" OR
+        process == "kandji-daemon" OR
+        process == "mdmclient" OR
+        process == "profiles" OR
+        process == "ManagedClient" OR
+        process == "softwareupdated" OR
+        subsystem == "com.apple.ManagedClient" OR
+        subsystem CONTAINS "kandji" OR
+        eventMessage CONTAINS "MDM" OR
+        eventMessage CONTAINS "Configuration Profile"
+    )'''
+
+    entries = get_log_entries(predicate)
+
+    # Filter for interesting events
+    interesting_keywords = [
+        "install", "remove", "profile", "command", "push", "enroll",
+        "policy", "restrict", "allow", "block", "update", "compliance"
+    ]
+
+    for entry in entries:
+        event_id = entry.get("eventID", entry.get("traceID", str(entry)))
+        if event_id in state["seen_events"]:
+            continue
+
+        process = entry.get("process", "MDM")
+        message = entry.get("eventMessage", "")
+        message_lower = message.lower()
+
+        # Only alert on interesting MDM events
+        if any(kw in message_lower for kw in interesting_keywords):
+            title = f"MDM: {process}"
+            body = message[:60] + "..." if len(message) > 60 else message
+            events.append(("alert", title, body))
+            state["seen_events"].append(event_id)
+
+    return events
+
+
+# =============================================================================
 # Main Plugin Logic
 # =============================================================================
 
@@ -587,10 +998,21 @@ def collect_all_events(state: Dict[str, Any]) -> List[Tuple[str, str, str]]:
     all_events.extend(parse_sudo_events(state))
     all_events.extend(parse_portscan_events(state))
     all_events.extend(parse_ftp_events(state))
+    all_events.extend(parse_dangerous_command_events(state))
+    all_events.extend(parse_mdm_events(state))
 
     # Network connection events
     all_events.extend(parse_port_events(state))
     all_events.extend(parse_vnc_events(state))
+    all_events.extend(parse_listening_port_events(state))
+
+    # File monitoring
+    all_events.extend(parse_dotenv_events(state))
+
+    # Network configuration monitoring
+    all_events.extend(parse_dns_events(state))
+    all_events.extend(parse_public_ip_events(state))
+    all_events.extend(parse_local_ip_events(state))
 
     return all_events
 
@@ -650,6 +1072,21 @@ def format_xbar_output(state: Dict[str, Any], new_events: List[Tuple[str, str, s
         if len(PORTS_TO_MONITOR) > 3:
             port_list += f" (+{len(PORTS_TO_MONITOR) - 3})"
         monitors.append(f"Ports: {port_list}")
+    if MONITOR_LISTENING:
+        monitors.append(f"Listening ({LISTENING_PORT_MIN}-{LISTENING_PORT_MAX})")
+    if MONITOR_DOTENV:
+        monitors.append(".env Files")
+    if MONITOR_DANGEROUS_COMMANDS:
+        monitors.append(f"Commands: {', '.join(DANGEROUS_COMMANDS)}")
+    if MONITOR_DNS:
+        monitors.append("DNS Resolvers")
+    if MONITOR_PUBLIC_IP:
+        public_ip = state.get("known_public_ip", "?")
+        monitors.append(f"Public IP ({public_ip})")
+    if MONITOR_LOCAL_IP:
+        monitors.append("Local IPs")
+    if MONITOR_MDM:
+        monitors.append("Kandji/MDM")
 
     for m in monitors:
         print(f"--✓ {m} | color=#228B22 size=12")
@@ -686,13 +1123,25 @@ def format_xbar_output(state: Dict[str, Any], new_events: List[Tuple[str, str, s
     # Configuration hints
     print("Configure... | color=#666666")
     print("--Edit plugin variables in xbar preferences | color=#999999 size=11")
+    print("-----")
+    print("--Core Monitors | color=#666666 size=11")
+    print(f"----MONITOR_SSH={MONITOR_SSH} | color=#999999 size=11")
+    print(f"----MONITOR_SUDO={MONITOR_SUDO} | color=#999999 size=11")
+    print(f"----MONITOR_PORTSCAN={MONITOR_PORTSCAN} | color=#999999 size=11")
+    print(f"----MONITOR_VNC={MONITOR_VNC} | color=#999999 size=11")
+    print(f"----MONITOR_PORTS={MONITOR_PORTS} | color=#999999 size=11")
+    print(f"----MONITORED_PORTS={MONITORED_PORTS} | color=#999999 size=11")
+    print("-----")
+    print("--New Monitors | color=#666666 size=11")
+    print(f"----MONITOR_LISTENING={MONITOR_LISTENING} | color=#999999 size=11")
+    print(f"----MONITOR_DOTENV={MONITOR_DOTENV} | color=#999999 size=11")
+    print(f"----MONITOR_DANGEROUS_COMMANDS={MONITOR_DANGEROUS_COMMANDS} | color=#999999 size=11")
+    print(f"----MONITOR_DNS={MONITOR_DNS} | color=#999999 size=11")
+    print(f"----MONITOR_PUBLIC_IP={MONITOR_PUBLIC_IP} | color=#999999 size=11")
+    print(f"----MONITOR_LOCAL_IP={MONITOR_LOCAL_IP} | color=#999999 size=11")
+    print(f"----MONITOR_MDM={MONITOR_MDM} | color=#999999 size=11")
+    print("-----")
     print(f"--SHOW_NOTIFICATIONS={SHOW_NOTIFICATIONS} | color=#999999 size=11")
-    print(f"--MONITOR_SSH={MONITOR_SSH} | color=#999999 size=11")
-    print(f"--MONITOR_SUDO={MONITOR_SUDO} | color=#999999 size=11")
-    print(f"--MONITOR_PORTSCAN={MONITOR_PORTSCAN} | color=#999999 size=11")
-    print(f"--MONITOR_VNC={MONITOR_VNC} | color=#999999 size=11")
-    print(f"--MONITOR_PORTS={MONITOR_PORTS} | color=#999999 size=11")
-    print(f"--MONITORED_PORTS={MONITORED_PORTS} | color=#999999 size=11")
 
 
 def main():

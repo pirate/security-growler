@@ -64,24 +64,37 @@ You can even forward alerts as push notifications to your iOS devices using [Pro
 
 The currently working alert types are:
 
- * SSH
- * VNC
- * FTP, SMB, AFP
- * MySQL, PostgreSQL
- * iTunes Sharing
- * sudo commands
- * port-scans (e.g. if you're on the receiving end of nmap)
+**Core Security Events:**
+ * SSH login attempts (successful and failed)
+ * VNC remote desktop connections
+ * FTP, SMB, AFP file sharing connections
+ * MySQL, PostgreSQL database connections
+ * iTunes Sharing connections
+ * sudo command execution
+ * Port scans (nmap-style detection)
+
+**Network Monitoring:**
+ * New listening ports opened (ports 21-9999)
+ * Public IP address changes
+ * Local IP address changes (per interface)
+ * DNS resolver changes
+
+**File & Process Monitoring:**
+ * New `.env` files created in home directory (via Spotlight)
+ * Dangerous command execution (`npx`, `uvx`, `op`)
+ * Kandji/MDM management events
 
 **Get more alerts like Wifi, VPN, LAN, bluetooth, USB device and other config changes using [HardwareGrowler](https://www.macupdate.com/app/mac/40750/hardwaregrowler) and [MetaGrowler](http://en.freedownloadmanager.org/Mac-OS/MetaGrowler-FREE.html).**
 
 TODO:
- * new alerts types like ARP resolution, DNS resolution, etc. tracked via [issues](https://github.com/pirate/security-growler/issues/)
+ * ARP resolution alerts tracked via [issues](https://github.com/pirate/security-growler/issues/)
  * keychain auth events
- * new listening sockets under port 1000 opened
 
 ### Config
 
 Configuration is done through xbar's plugin variables. Click on the plugin in the menubar, then open xbar preferences to modify these settings:
+
+**Core Monitors:**
 
 | Variable | Default | Description |
 |----------|---------|-------------|
@@ -92,6 +105,18 @@ Configuration is done through xbar's plugin variables. Click on the plugin in th
 | `MONITOR_VNC` | `true` | Monitor VNC (port 5900) connections |
 | `MONITOR_PORTS` | `true` | Monitor network connections on specified ports |
 | `MONITORED_PORTS` | `21,445,548,3306,3689,5432` | Comma-separated list of ports to monitor |
+
+**New Monitors:**
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `MONITOR_LISTENING` | `true` | Alert when new listening ports opened (21-9999) |
+| `MONITOR_DOTENV` | `true` | Alert when new .env files created in ~/ (excludes ~/Library) |
+| `MONITOR_DANGEROUS_COMMANDS` | `true` | Alert when `npx`, `uvx`, or `op` commands run |
+| `MONITOR_DNS` | `true` | Alert when system DNS resolvers change |
+| `MONITOR_PUBLIC_IP` | `true` | Alert when public IP address changes |
+| `MONITOR_LOCAL_IP` | `true` | Alert when local IP addresses change |
+| `MONITOR_MDM` | `true` | Alert on Kandji/MDM management events |
 
 Default ports monitored:
 - **21**: FTP
@@ -114,7 +139,12 @@ In general, don't assume you're being attacked just because you get an alert, th
  - iTunes Sharing: turn off iTunes sharing under `iTunes > Preferences... > Sharing > Share my library on my local network`
  - Port scans: unplug your ethernet cable, turn off public services, or turn on your firewall to stealth mode: `sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setstealthmode on`
  - Sudo commands: check for any open ssh connections using the `w` command in terminal and check for background processes running with Activity Monitor
-
+ - New listening ports: investigate which process opened the port with `lsof -i:<port>` and determine if it's legitimate
+ - New .env files: check the file contents for sensitive data and ensure it's not being exfiltrated; review recent `git clone` or `npm install` commands
+ - npx/uvx/op commands: these can execute arbitrary remote code; verify you initiated the command and review what package was run
+ - DNS changes: check if you changed networks or VPN; unexpected DNS changes could indicate MITM attacks
+ - Public/Local IP changes: normal when switching networks; unexpected changes while stationary could indicate network issues
+ - MDM events: review Kandji/MDM console if you're an admin; unexpected profile installs could indicate compromise
 
  You can check for processes listening on a given TCP port (e.g. 80) using `sudo lsof +c 0 -i:80`.
  You can see active network connections with `sudo netstat -t` or `iftop` (`brew install iftop`).
@@ -125,12 +155,16 @@ In general, don't assume you're being attacked just because you get an alert, th
 
 The plugin is a single Python 3 script (`security-growler.30s.py`) that uses:
 
-- **macOS Unified Logging**: Queries `/usr/bin/log` with predicates to detect SSH, sudo, portscan, and FTP events from the modern unified logging system (replaces the old `/var/log/system.log` approach)
-- **lsof**: Monitors TCP connections on configured ports
+- **macOS Unified Logging**: Queries `/usr/bin/log` with predicates to detect SSH, sudo, portscan, FTP, dangerous commands (npx/uvx/op), and MDM events
+- **lsof**: Monitors TCP connections and listening ports
+- **mdfind (Spotlight)**: Efficiently watches for new .env files without filesystem polling
+- **scutil**: Monitors DNS resolver configuration changes
+- **ipconfig**: Tracks local IP addresses per interface
+- **curl/dig**: Checks public IP address via external services
 - **xbar**: Handles the menubar display and built-in 30-second polling
 - **desktop-notifier**: Sends native macOS notifications (falls back to osascript if not installed)
 
-State is persisted to `~/Library/Application Support/SecurityGrowler/state.json` to track seen events and known connections. Logs are written to `~/Library/Logs/SecurityGrowler.log`.
+State is persisted to `~/Library/Application Support/SecurityGrowler/state.json` to track seen events, known connections, listening ports, IP addresses, DNS resolvers, and .env files. Logs are written to `~/Library/Logs/SecurityGrowler.log`.
 
 To test changes, run the plugin directly:
 ```bash
