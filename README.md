@@ -156,7 +156,8 @@ In general, don't assume you're being attacked just because you get an alert, th
 The plugin is a single Python 3 script (`security-growler.30s.py`) that uses:
 
 - **macOS Unified Logging**: Queries `/usr/bin/log` with predicates to detect SSH, sudo, portscan, FTP, and MDM events
-- **ps**: Polls for dangerous command execution (npx, uvx, op) - works with any shell
+- **Shell history**: Monitors ~/.zsh_history, ~/.bash_history, ~/.local/share/fish/fish_history for dangerous commands (npx, uvx, op) - catches even short-lived commands
+- **ps**: Also polls for currently running dangerous commands as backup
 - **lsof**: Monitors TCP connections and listening ports
 - **find**: Detects new .env files created in home directory (excludes Library, .git, node_modules)
 - **scutil**: Monitors DNS resolver configuration changes

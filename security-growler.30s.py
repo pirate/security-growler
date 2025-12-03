@@ -725,13 +725,92 @@ def parse_dotenv_events(state: Dict[str, Any]) -> List[Tuple[str, str, str]]:
 
 
 # =============================================================================
-# Dangerous Commands Monitor (npx, uvx, op) - uses ps polling
+# Dangerous Commands Monitor (npx, uvx, op) - uses shell history + ps polling
 # =============================================================================
+
+def get_shell_history_commands() -> List[Dict[str, str]]:
+    """
+    Read recent commands from shell history files.
+    Works with zsh, bash, and fish shells.
+    """
+    home = Path.home()
+    commands = []
+
+    # Shell history file locations and their formats
+    history_files = [
+        (home / ".zsh_history", "zsh"),
+        (home / ".bash_history", "bash"),
+        (home / ".local/share/fish/fish_history", "fish"),
+    ]
+
+    for hist_file, shell_type in history_files:
+        if not hist_file.exists():
+            continue
+
+        try:
+            # Read last 50 lines of history (recent commands)
+            with open(hist_file, "rb") as f:
+                # Seek to end and read backwards to get recent lines
+                try:
+                    f.seek(0, 2)  # End of file
+                    size = f.tell()
+                    # Read last 8KB or whole file if smaller
+                    read_size = min(8192, size)
+                    f.seek(max(0, size - read_size))
+                    content = f.read().decode("utf-8", errors="ignore")
+                except Exception:
+                    continue
+
+            lines = content.splitlines()[-50:]  # Last 50 commands
+
+            for line in lines:
+                # Parse based on shell type
+                cmd = ""
+                if shell_type == "zsh":
+                    # zsh format: ": timestamp:0;command" or just "command"
+                    if line.startswith(":"):
+                        parts = line.split(";", 1)
+                        if len(parts) > 1:
+                            cmd = parts[1]
+                    else:
+                        cmd = line
+                elif shell_type == "bash":
+                    cmd = line
+                elif shell_type == "fish":
+                    # fish format: "- cmd: command"
+                    if line.startswith("- cmd:"):
+                        cmd = line[6:].strip()
+
+                cmd = cmd.strip()
+                if not cmd:
+                    continue
+
+                # Check if command starts with or contains dangerous commands
+                cmd_lower = cmd.lower()
+                cmd_parts = cmd.split()
+
+                for dangerous_cmd in DANGEROUS_COMMANDS:
+                    # Check if it's the command itself or run via path
+                    first_word = cmd_parts[0].lower() if cmd_parts else ""
+                    if (first_word == dangerous_cmd or
+                        first_word.endswith(f"/{dangerous_cmd}") or
+                        cmd_lower.startswith(f"{dangerous_cmd} ")):
+                        commands.append({
+                            "command": dangerous_cmd,
+                            "full_cmd": cmd[:100],
+                            "shell": shell_type,
+                            "source": "history",
+                        })
+                        break
+
+        except (IOError, OSError):
+            continue
+
+    return commands
+
 
 def get_running_dangerous_commands() -> List[Dict[str, str]]:
     """Find running instances of dangerous commands using ps."""
-    # Use ps to find processes - works regardless of shell
-    # ps -eo pid,user,comm,args shows PID, user, command name, and full args
     cmd = "ps -eo pid,user,comm,args 2>/dev/null"
 
     try:
@@ -745,35 +824,33 @@ def get_running_dangerous_commands() -> List[Dict[str, str]]:
 
         processes = []
         for line in result.stdout.strip().splitlines()[1:]:  # Skip header
-            parts = line.split(None, 3)  # Split into max 4 parts
+            parts = line.split(None, 3)
             if len(parts) >= 3:
                 pid = parts[0]
                 user = parts[1]
                 comm = parts[2]
                 args = parts[3] if len(parts) > 3 else comm
 
-                # Check if this is a dangerous command
-                # Match command name or if it appears in args (for things like "node /path/to/npx")
                 comm_lower = comm.lower()
                 args_lower = args.lower()
 
                 for dangerous_cmd in DANGEROUS_COMMANDS:
-                    # Direct match on command name
                     if comm_lower == dangerous_cmd or comm_lower.endswith(f"/{dangerous_cmd}"):
                         processes.append({
                             "pid": pid,
                             "user": user,
                             "command": dangerous_cmd,
-                            "args": args[:100],  # Truncate long args
+                            "full_cmd": args[:100],
+                            "source": "process",
                         })
                         break
-                    # Check if dangerous command appears in args (e.g., "node /usr/local/bin/npx ...")
                     elif f"/{dangerous_cmd}" in args_lower or f" {dangerous_cmd} " in f" {args_lower} ":
                         processes.append({
                             "pid": pid,
                             "user": user,
                             "command": dangerous_cmd,
-                            "args": args[:100],
+                            "full_cmd": args[:100],
+                            "source": "process",
                         })
                         break
 
@@ -784,33 +861,57 @@ def get_running_dangerous_commands() -> List[Dict[str, str]]:
 
 
 def parse_dangerous_command_events(state: Dict[str, Any]) -> List[Tuple[str, str, str]]:
-    """Monitor for npx, uvx, op command execution using ps polling."""
+    """Monitor for npx, uvx, op command execution using history + ps polling."""
     if not MONITOR_DANGEROUS_COMMANDS:
         return []
 
     events = []
+    seen_commands = set(state.get("seen_dangerous_commands", []))
     seen_pids = set(state.get("seen_dangerous_pids", []))
-    current_processes = get_running_dangerous_commands()
 
-    for proc in current_processes:
-        pid = proc["pid"]
-        if pid not in seen_pids:
+    # Check shell history for completed commands
+    history_commands = get_shell_history_commands()
+    for cmd_info in history_commands:
+        # Create a unique key for this command (use full command to dedupe)
+        cmd_key = f"hist:{cmd_info['full_cmd']}"
+        if cmd_key not in seen_commands:
+            seen_commands.add(cmd_key)
+
+            title = f"COMMAND: {cmd_info['command']}"
+            full_cmd = cmd_info["full_cmd"]
+            if len(full_cmd) > 55:
+                full_cmd = full_cmd[:52] + "..."
+            body = f"[{cmd_info['shell']}] {full_cmd}"
+            events.append(("alert", title, body))
+
+    # Check for currently running processes
+    running_processes = get_running_dangerous_commands()
+    current_pids = set()
+
+    for proc in running_processes:
+        pid = proc.get("pid", "")
+        current_pids.add(pid)
+
+        if pid and pid not in seen_pids:
             seen_pids.add(pid)
 
             title = f"COMMAND: {proc['command']}"
-            # Show truncated args, removing the command itself from display
-            args_display = proc["args"]
-            if len(args_display) > 60:
-                args_display = args_display[:57] + "..."
-            body = f"PID {pid} by {proc['user']}: {args_display}"
-
+            full_cmd = proc["full_cmd"]
+            if len(full_cmd) > 50:
+                full_cmd = full_cmd[:47] + "..."
+            body = f"PID {pid} by {proc.get('user', '?')}: {full_cmd}"
             events.append(("alert", title, body))
 
-    # Clean up old PIDs that are no longer running
-    current_pids = {p["pid"] for p in current_processes}
-    # Keep PIDs that are still running, remove old ones
-    state["seen_dangerous_pids"] = list(seen_pids & current_pids |
-                                         {p for p in seen_pids if p in current_pids})
+    # Keep only recent history entries (last 100) to prevent unbounded growth
+    if len(seen_commands) > 100:
+        # Convert to list, keep last 100, convert back to set
+        seen_commands = set(list(seen_commands)[-100:])
+
+    # Clean up PIDs no longer running
+    seen_pids = seen_pids & current_pids
+
+    state["seen_dangerous_commands"] = list(seen_commands)
+    state["seen_dangerous_pids"] = list(seen_pids)
 
     return events
 
