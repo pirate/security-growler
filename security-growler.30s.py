@@ -27,6 +27,7 @@ port scans, network connections, and more using the unified logging system.
 <xbar.var>boolean(MONITOR_PUBLIC_IP=true): Monitor public IP address changes</xbar.var>
 <xbar.var>boolean(MONITOR_LOCAL_IP=true): Monitor local IP address changes</xbar.var>
 <xbar.var>boolean(MONITOR_MDM=true): Monitor Kandji/MDM events</xbar.var>
+<xbar.var>boolean(MONITOR_ARP_SPOOF=true): Monitor for ARP spoofing attacks</xbar.var>
 """
 
 import os
@@ -68,6 +69,7 @@ MONITOR_DNS = os.environ.get("MONITOR_DNS", "true").lower() == "true"
 MONITOR_PUBLIC_IP = os.environ.get("MONITOR_PUBLIC_IP", "true").lower() == "true"
 MONITOR_LOCAL_IP = os.environ.get("MONITOR_LOCAL_IP", "true").lower() == "true"
 MONITOR_MDM = os.environ.get("MONITOR_MDM", "true").lower() == "true"
+MONITOR_ARP_SPOOF = os.environ.get("MONITOR_ARP_SPOOF", "true").lower() == "true"
 
 # Listening port range to monitor
 LISTENING_PORT_MIN = 21
@@ -1138,6 +1140,194 @@ def parse_mdm_events(state: Dict[str, Any]) -> List[Tuple[str, str, str]]:
 
 
 # =============================================================================
+# ARP Spoofing Detection
+# =============================================================================
+
+def get_gateway_info() -> Optional[Dict[str, str]]:
+    """Get the default gateway IP and interface."""
+    cmd = "route -n get default 2>/dev/null | grep -E 'gateway:|interface:' | awk '{print $2}'"
+
+    try:
+        result = subprocess.run(
+            cmd,
+            shell=True,
+            capture_output=True,
+            text=True,
+            timeout=5
+        )
+
+        lines = [line.strip() for line in result.stdout.strip().splitlines() if line.strip()]
+        if len(lines) >= 2:
+            return {
+                "gateway_ip": lines[0],
+                "interface": lines[1]
+            }
+
+    except (subprocess.TimeoutExpired, subprocess.SubprocessError):
+        pass
+
+    return None
+
+
+def get_mac_address(ip: str) -> Optional[str]:
+    """Get MAC address for a given IP from ARP table."""
+    cmd = f"arp -n {ip} 2>/dev/null | grep -v 'no entry' | grep -v 'incomplete' | tail -1 | awk '{{print $4}}'"
+
+    try:
+        result = subprocess.run(
+            cmd,
+            shell=True,
+            capture_output=True,
+            text=True,
+            timeout=5
+        )
+
+        mac = result.stdout.strip()
+        # Validate MAC address format (aa:bb:cc:dd:ee:ff)
+        if mac and ":" in mac and len(mac) >= 14:
+            return mac.lower()
+
+    except (subprocess.TimeoutExpired, subprocess.SubprocessError):
+        pass
+
+    return None
+
+
+def get_own_ip_and_mac(interface: str = "en0") -> Optional[Dict[str, str]]:
+    """Get our own IP and MAC address for the given interface."""
+    info = {}
+
+    # Get IP address
+    try:
+        result = subprocess.run(
+            ["ipconfig", "getifaddr", interface],
+            capture_output=True,
+            text=True,
+            timeout=2
+        )
+        ip = result.stdout.strip()
+        if ip:
+            info["ip"] = ip
+    except (subprocess.TimeoutExpired, subprocess.SubprocessError):
+        return None
+
+    # Get MAC address
+    cmd = f"ifconfig {interface} 2>/dev/null | grep ether | awk '{{print $2}}'"
+    try:
+        result = subprocess.run(
+            cmd,
+            shell=True,
+            capture_output=True,
+            text=True,
+            timeout=2
+        )
+        mac = result.stdout.strip()
+        if mac:
+            info["mac"] = mac.lower()
+    except (subprocess.TimeoutExpired, subprocess.SubprocessError):
+        return None
+
+    return info if "ip" in info and "mac" in info else None
+
+
+def check_arp_table_for_duplicates(our_ip: str) -> List[str]:
+    """Check ARP table for multiple MAC addresses claiming our IP."""
+    cmd = f"arp -a 2>/dev/null | grep '({our_ip})' | awk '{{print $4}}'"
+
+    try:
+        result = subprocess.run(
+            cmd,
+            shell=True,
+            capture_output=True,
+            text=True,
+            timeout=5
+        )
+
+        macs = []
+        for line in result.stdout.strip().splitlines():
+            mac = line.strip().lower()
+            if mac and ":" in mac and len(mac) >= 14:
+                macs.append(mac)
+
+        return macs
+
+    except (subprocess.TimeoutExpired, subprocess.SubprocessError):
+        return []
+
+
+def parse_arp_spoof_events(state: Dict[str, Any]) -> List[Tuple[str, str, str]]:
+    """Monitor for ARP spoofing attacks."""
+    if not MONITOR_ARP_SPOOF:
+        return []
+
+    events = []
+
+    # Get gateway information
+    gateway_info = get_gateway_info()
+    if not gateway_info:
+        # Can't monitor without gateway info
+        return events
+
+    gateway_ip = gateway_info["gateway_ip"]
+    interface = gateway_info["interface"]
+
+    # Method 1: Check if gateway MAC has changed (gateway spoofing)
+    try:
+        # Ping gateway to ensure fresh ARP entry
+        subprocess.run(
+            ["ping", "-c", "1", "-W", "1", gateway_ip],
+            capture_output=True,
+            timeout=3
+        )
+    except (subprocess.TimeoutExpired, subprocess.SubprocessError):
+        pass
+
+    current_gateway_mac = get_mac_address(gateway_ip)
+
+    if current_gateway_mac:
+        known_gateway_mac = state.get("known_gateway_mac")
+        known_gateway_ip = state.get("known_gateway_ip")
+
+        # Check if gateway MAC changed for the same IP
+        if known_gateway_mac and known_gateway_ip == gateway_ip:
+            if current_gateway_mac != known_gateway_mac:
+                title = "ARP SPOOF: Gateway MAC Changed"
+                body = f"Gateway {gateway_ip} MAC changed: {known_gateway_mac} → {current_gateway_mac}"
+                events.append(("alert", title, body))
+
+        # Update known gateway
+        state["known_gateway_mac"] = current_gateway_mac
+        state["known_gateway_ip"] = gateway_ip
+
+    # Method 2: Check if our own IP is being claimed by another MAC (own IP spoofing)
+    own_info = get_own_ip_and_mac(interface)
+
+    if own_info:
+        our_ip = own_info["ip"]
+        our_mac = own_info["mac"]
+
+        # Check ARP table for duplicates of our IP
+        arp_macs = check_arp_table_for_duplicates(our_ip)
+
+        # Filter out our own MAC
+        foreign_macs = [mac for mac in arp_macs if mac != our_mac]
+
+        if foreign_macs:
+            # Someone else is claiming our IP!
+            for foreign_mac in foreign_macs:
+                # Create unique event ID
+                event_id = f"arp_spoof_own_ip_{our_ip}_{foreign_mac}"
+
+                if event_id not in state["seen_events"]:
+                    title = "ARP SPOOF: Own IP Claimed"
+                    body = f"MAC {foreign_mac} is claiming your IP {our_ip}"
+                    events.append(("alert", title, body))
+                    state["seen_events"].append(event_id)
+
+    return events
+
+
+# =============================================================================
 # Main Plugin Logic
 # =============================================================================
 
@@ -1165,6 +1355,9 @@ def collect_all_events(state: Dict[str, Any]) -> List[Tuple[str, str, str]]:
     all_events.extend(parse_dns_events(state))
     all_events.extend(parse_public_ip_events(state))
     all_events.extend(parse_local_ip_events(state))
+
+    # ARP spoofing detection
+    all_events.extend(parse_arp_spoof_events(state))
 
     return all_events
 
@@ -1239,6 +1432,9 @@ def format_xbar_output(state: Dict[str, Any], new_events: List[Tuple[str, str, s
         monitors.append("Local IPs")
     if MONITOR_MDM:
         monitors.append("Kandji/MDM")
+    if MONITOR_ARP_SPOOF:
+        gateway_mac = state.get("known_gateway_mac", "?")[:8] if state.get("known_gateway_mac") else "?"
+        monitors.append(f"ARP Spoofing (GW: {gateway_mac}...)")
 
     for m in monitors:
         print(f"--✓ {m} | color=#228B22 size=12")
@@ -1292,6 +1488,7 @@ def format_xbar_output(state: Dict[str, Any], new_events: List[Tuple[str, str, s
     print(f"----MONITOR_PUBLIC_IP={MONITOR_PUBLIC_IP} | color=#999999 size=11")
     print(f"----MONITOR_LOCAL_IP={MONITOR_LOCAL_IP} | color=#999999 size=11")
     print(f"----MONITOR_MDM={MONITOR_MDM} | color=#999999 size=11")
+    print(f"----MONITOR_ARP_SPOOF={MONITOR_ARP_SPOOF} | color=#999999 size=11")
     print("-----")
     print(f"--SHOW_NOTIFICATIONS={SHOW_NOTIFICATIONS} | color=#999999 size=11")
 

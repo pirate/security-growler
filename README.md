@@ -78,6 +78,7 @@ The currently working alert types are:
  * Public IP address changes
  * Local IP address changes (per interface)
  * DNS resolver changes
+ * ARP spoofing/poisoning attacks (gateway & own IP)
 
 **File & Process Monitoring:**
  * New `.env` files created in home directory (via Spotlight)
@@ -87,7 +88,6 @@ The currently working alert types are:
 **Get more alerts like Wifi, VPN, LAN, bluetooth, USB device and other config changes using [HardwareGrowler](https://www.macupdate.com/app/mac/40750/hardwaregrowler) and [MetaGrowler](http://en.freedownloadmanager.org/Mac-OS/MetaGrowler-FREE.html).**
 
 TODO:
- * ARP resolution alerts tracked via [issues](https://github.com/pirate/security-growler/issues/)
  * keychain auth events
 
 ### Config
@@ -117,6 +117,7 @@ Configuration is done through xbar's plugin variables. Click on the plugin in th
 | `MONITOR_PUBLIC_IP` | `true` | Alert when public IP address changes |
 | `MONITOR_LOCAL_IP` | `true` | Alert when local IP addresses change |
 | `MONITOR_MDM` | `true` | Alert on Kandji/MDM management events |
+| `MONITOR_ARP_SPOOF` | `true` | Alert on ARP spoofing/poisoning attacks |
 
 Default ports monitored:
 - **21**: FTP
@@ -145,6 +146,7 @@ In general, don't assume you're being attacked just because you get an alert, th
  - DNS changes: check if you changed networks or VPN; unexpected DNS changes could indicate MITM attacks
  - Public/Local IP changes: normal when switching networks; unexpected changes while stationary could indicate network issues
  - MDM events: review Kandji/MDM console if you're an admin; unexpected profile installs could indicate compromise
+ - ARP spoofing: disconnect from network immediately; someone may be intercepting your traffic; check for malicious devices on your network using `arp -a`; consider using static ARP entries for critical hosts or enabling ARP inspection on managed networks
 
  You can check for processes listening on a given TCP port (e.g. 80) using `sudo lsof +c 0 -i:80`.
  You can see active network connections with `sudo netstat -t` or `iftop` (`brew install iftop`).
