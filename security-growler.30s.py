@@ -725,41 +725,92 @@ def parse_dotenv_events(state: Dict[str, Any]) -> List[Tuple[str, str, str]]:
 
 
 # =============================================================================
-# Dangerous Commands Monitor (npx, uvx, op)
+# Dangerous Commands Monitor (npx, uvx, op) - uses ps polling
 # =============================================================================
 
+def get_running_dangerous_commands() -> List[Dict[str, str]]:
+    """Find running instances of dangerous commands using ps."""
+    # Use ps to find processes - works regardless of shell
+    # ps -eo pid,user,comm,args shows PID, user, command name, and full args
+    cmd = "ps -eo pid,user,comm,args 2>/dev/null"
+
+    try:
+        result = subprocess.run(
+            cmd,
+            shell=True,
+            capture_output=True,
+            text=True,
+            timeout=5
+        )
+
+        processes = []
+        for line in result.stdout.strip().splitlines()[1:]:  # Skip header
+            parts = line.split(None, 3)  # Split into max 4 parts
+            if len(parts) >= 3:
+                pid = parts[0]
+                user = parts[1]
+                comm = parts[2]
+                args = parts[3] if len(parts) > 3 else comm
+
+                # Check if this is a dangerous command
+                # Match command name or if it appears in args (for things like "node /path/to/npx")
+                comm_lower = comm.lower()
+                args_lower = args.lower()
+
+                for dangerous_cmd in DANGEROUS_COMMANDS:
+                    # Direct match on command name
+                    if comm_lower == dangerous_cmd or comm_lower.endswith(f"/{dangerous_cmd}"):
+                        processes.append({
+                            "pid": pid,
+                            "user": user,
+                            "command": dangerous_cmd,
+                            "args": args[:100],  # Truncate long args
+                        })
+                        break
+                    # Check if dangerous command appears in args (e.g., "node /usr/local/bin/npx ...")
+                    elif f"/{dangerous_cmd}" in args_lower or f" {dangerous_cmd} " in f" {args_lower} ":
+                        processes.append({
+                            "pid": pid,
+                            "user": user,
+                            "command": dangerous_cmd,
+                            "args": args[:100],
+                        })
+                        break
+
+        return processes
+
+    except (subprocess.TimeoutExpired, subprocess.SubprocessError):
+        return []
+
+
 def parse_dangerous_command_events(state: Dict[str, Any]) -> List[Tuple[str, str, str]]:
-    """Monitor for npx, uvx, op command execution."""
+    """Monitor for npx, uvx, op command execution using ps polling."""
     if not MONITOR_DANGEROUS_COMMANDS:
         return []
 
     events = []
+    seen_pids = set(state.get("seen_dangerous_pids", []))
+    current_processes = get_running_dangerous_commands()
 
-    # Build predicate for dangerous commands
-    command_predicates = " OR ".join(
-        f'(process == "{cmd}")' for cmd in DANGEROUS_COMMANDS
-    )
-    predicate = f'({command_predicates})'
+    for proc in current_processes:
+        pid = proc["pid"]
+        if pid not in seen_pids:
+            seen_pids.add(pid)
 
-    entries = get_log_entries(predicate)
+            title = f"COMMAND: {proc['command']}"
+            # Show truncated args, removing the command itself from display
+            args_display = proc["args"]
+            if len(args_display) > 60:
+                args_display = args_display[:57] + "..."
+            body = f"PID {pid} by {proc['user']}: {args_display}"
 
-    for entry in entries:
-        event_id = entry.get("eventID", entry.get("traceID", str(entry)))
-        if event_id in state["seen_events"]:
-            continue
+            events.append(("alert", title, body))
 
-        process = entry.get("process", "unknown")
-        message = entry.get("eventMessage", "")
-        sender = entry.get("sender", "")
-
-        # Get additional context
-        title = f"COMMAND: {process}"
-        body = message[:60] + "..." if len(message) > 60 else message
-        if not body:
-            body = f"executed by {sender}" if sender else "command executed"
-
-        events.append(("alert", title, body))
-        state["seen_events"].append(event_id)
+    # Clean up old PIDs that are no longer running
+    current_pids = {p["pid"] for p in current_processes}
+    # Keep PIDs that are still running, remove old ones
+    state["seen_dangerous_pids"] = list(seen_pids & current_pids |
+                                         {p for p in seen_pids if p in current_pids})
 
     return events
 
