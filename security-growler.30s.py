@@ -35,6 +35,7 @@ import sys
 import json
 import asyncio
 import subprocess
+import hashlib
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Optional, List, Dict, Tuple, Any
@@ -146,6 +147,93 @@ def log_event(event_type: str, title: str, body: str) -> None:
         LOG_FILE.write_text("\n".join(existing[-MAX_LOG_LINES:]) + "\n")
     except IOError:
         pass
+
+
+# =============================================================================
+# Auto-Update Checking
+# =============================================================================
+
+def compute_file_sha256(filepath: str) -> Optional[str]:
+    """Compute SHA256 hash of a file."""
+    try:
+        sha256_hash = hashlib.sha256()
+        with open(filepath, "rb") as f:
+            # Read in chunks to handle large files
+            for byte_block in iter(lambda: f.read(4096), b""):
+                sha256_hash.update(byte_block)
+        return sha256_hash.hexdigest()
+    except (IOError, OSError):
+        return None
+
+
+def fetch_remote_script_hash() -> Optional[str]:
+    """Fetch the latest version of this script from GitHub and compute its hash."""
+    github_raw_url = "https://github.com/pirate/security-growler/raw/master/security-growler.30s.py"
+
+    try:
+        # Use curl to fetch the remote script
+        result = subprocess.run(
+            ["curl", "--max-time", "10", "--silent", "--location", github_raw_url],
+            capture_output=True,
+            timeout=15
+        )
+
+        if result.returncode != 0:
+            return None
+
+        # Compute hash of remote content
+        remote_content = result.stdout
+        if not remote_content:
+            return None
+
+        sha256_hash = hashlib.sha256()
+        sha256_hash.update(remote_content)
+        return sha256_hash.hexdigest()
+
+    except (subprocess.TimeoutExpired, subprocess.SubprocessError):
+        return None
+
+
+def check_for_updates(state: Dict[str, Any]) -> List[Tuple[str, str, str]]:
+    """Check if a new version is available on GitHub."""
+    events = []
+
+    # Only check once per day
+    last_update_check = state.get("last_update_check")
+    if last_update_check:
+        try:
+            last_check_time = datetime.fromisoformat(last_update_check)
+            if datetime.now() - last_check_time < timedelta(days=1):
+                # Skip check, too soon
+                return events
+        except (ValueError, TypeError):
+            pass
+
+    # Get path to this script
+    script_path = os.path.abspath(__file__)
+
+    # Compute local hash
+    local_hash = compute_file_sha256(script_path)
+    if not local_hash:
+        return events
+
+    # Fetch and compute remote hash
+    remote_hash = fetch_remote_script_hash()
+    if not remote_hash:
+        # Failed to fetch, but don't alert
+        return events
+
+    # Compare hashes
+    if local_hash != remote_hash:
+        title = "UPDATE AVAILABLE"
+        body = "New version of Security Growler detected"
+        download_url = "https://github.com/pirate/security-growler/releases"
+        events.append(("alert", title, f"{body} - {download_url}"))
+
+    # Update last check time
+    state["last_update_check"] = datetime.now().isoformat()
+
+    return events
 
 
 # =============================================================================
@@ -1358,6 +1446,9 @@ def collect_all_events(state: Dict[str, Any]) -> List[Tuple[str, str, str]]:
 
     # ARP spoofing detection
     all_events.extend(parse_arp_spoof_events(state))
+
+    # Auto-update checking
+    all_events.extend(check_for_updates(state))
 
     return all_events
 
