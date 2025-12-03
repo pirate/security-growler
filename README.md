@@ -157,7 +157,7 @@ The plugin is a single Python 3 script (`security-growler.30s.py`) that uses:
 
 - **macOS Unified Logging**: Queries `/usr/bin/log` with predicates to detect SSH, sudo, portscan, FTP, dangerous commands (npx/uvx/op), and MDM events
 - **lsof**: Monitors TCP connections and listening ports
-- **mdfind (Spotlight)**: Efficiently watches for new .env files without filesystem polling
+- **find**: Detects new .env files created in home directory (excludes Library, .git, node_modules)
 - **scutil**: Monitors DNS resolver configuration changes
 - **ipconfig**: Tracks local IP addresses per interface
 - **curl/dig**: Checks public IP address via external services

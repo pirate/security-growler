@@ -663,18 +663,19 @@ def parse_listening_port_events(state: Dict[str, Any]) -> List[Tuple[str, str, s
 
 
 # =============================================================================
-# .env File Monitor (using Spotlight/mdfind)
+# .env File Monitor (using find)
 # =============================================================================
 
 def find_recent_dotenv_files() -> List[str]:
-    """Find .env files modified in the last 2 minutes using Spotlight, excluding ~/Library."""
+    """Find .env files modified in the last 2 minutes using find, excluding ~/Library."""
     home = str(Path.home())
-    library = str(Path.home() / "Library")
 
-    # Use mdfind (Spotlight) to find .env files modified recently
-    # kMDItemFSName == "*.env" finds files ending in .env
-    # kMDItemContentModificationDate >= $time.now(-120) finds files modified in last 2 minutes
-    cmd = f'''mdfind -onlyin "{home}" '(kMDItemFSName == "*.env" || kMDItemFSName == ".env") && kMDItemContentModificationDate >= $time.now(-120)' 2>/dev/null'''
+    # Use find to locate .env files modified in last 2 minutes
+    # -mmin -2 means modified within last 2 minutes
+    # -name matches both .env and *.env files
+    # -not -path excludes ~/Library
+    # -type f ensures we only get files
+    cmd = f'''find "{home}" -maxdepth 6 -type f \\( -name ".env" -o -name "*.env" \\) -mmin -2 -not -path "*/Library/*" -not -path "*/.git/*" -not -path "*/node_modules/*" 2>/dev/null'''
 
     try:
         result = subprocess.run(
@@ -682,14 +683,13 @@ def find_recent_dotenv_files() -> List[str]:
             shell=True,
             capture_output=True,
             text=True,
-            timeout=10
+            timeout=15
         )
 
         files = []
         for line in result.stdout.strip().splitlines():
             path = line.strip()
-            # Exclude ~/Library
-            if path and not path.startswith(library):
+            if path:
                 files.append(path)
 
         return files
