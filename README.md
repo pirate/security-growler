@@ -1,197 +1,142 @@
-# [Security Growler](https://pirate.github.io/security-growler)  <img src="https://pirate.github.io/security-growler/alert.png" height="20px"/>  [![Github Stars](https://img.shields.io/github/stars/pirate/security-growler.svg)](https://github.com/pirate/security-growler) [![Twitter URL](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/thesquashSH)
+# Security Growler
 
-**Development is temporarily on hold, check out these alternatives in the meantime:**
+<img src="https://pirate.github.io/security-growler/alert.png" height="20px"/> [![Github Stars](https://img.shields.io/github/stars/pirate/security-growler.svg)](https://github.com/pirate/security-growler)
 
- -  ⭐️ [Lulu](https://objective-see.com/products/lulu.html)
- -  ⭐️ [Little Snitch](https://www.obdev.at/products/littlesnitch/index.html)
- -  ⭐️ [Radio Silence](https://radiosilenceapp.com/)
- - [HandsOff](https://www.macupdate.com/app/mac/35277/hands-off)
- - [Marus](http://www.murusfirewall.com/)
- - [Private Eye](https://radiosilenceapp.com/private-eye)
- - [TCPBlock](https://www.macupdate.com/app/mac/35914/tcpblock)
-  
-**I have a refactor in-progress to fix Security Growler for macOS Sierra using Bitbar, but I'm too busy to finish it at the moment.**
-
----
-
-This menubar app for OS X will notify you via Notification Center (or Growl) when various security events occur ([see list](https://github.com/pirate/security-growler#documentation)).
+A lightweight [xbar](https://xbarapp.com/) plugin for macOS that monitors security events and sends notifications. Detects SSH logins, sudo commands, port scans, VNC connections, and network activity on configurable ports.
 
 <img src="http://pirate.github.io/security-growler/screenshots/portscan_event.PNG" width="45%"/>
 <img src="http://pirate.github.io/security-growler/screenshots/vnc_event.PNG" width="45%"/>
 
-It's very useful if you're paranoid about people trying to hack into your computer.  Or... if you simply like having information about people using your computer's resources.
+## Features
 
-It's extremely lightweight, the app is 3MB including the icon, with <0.01% CPU and <15MB of RAM used when running.
-It's easily extensible in Python, you can add parsers that detect new TCP connections or poll logfiles.
-You can even forward alerts as push notifications to your iOS devices using [Prowl](http://prowlapp.com/).
+- **SSH Monitoring**: Alerts on successful and failed SSH login attempts
+- **Sudo Tracking**: Notifications when sudo commands are executed
+- **Port Scan Detection**: Detects incoming port scans (nmap-style)
+- **VNC Connections**: High-priority alerts for remote desktop connections
+- **Network Ports**: Monitor connections on FTP, SMB, AFP, MySQL, PostgreSQL, iTunes Sharing, and custom ports
+- **FTP Access**: Track FTP daemon activity
+- **Native Notifications**: Uses [desktop-notifier](https://github.com/samschott/desktop-notifier) for rich macOS notifications with fallback to osascript
 
-## Install:
-1. Download and run [Security Growler.app >>](https://github.com/pirate/security-growler/raw/master/Security%20Growler.app.zip) (dark mode)
-2. Click on the menubar icon once to start detecting events.
+## Requirements
 
-<img src="http://pirate.github.io/security-growler/screenshots/menubar_2.PNG" width="45%"/>
-<img src="http://pirate.github.io/security-growler/screenshots/menubar_1.PNG" width="45%"/>
+- macOS 10.15+ (Catalina or later) - uses unified logging system
+- [xbar](https://xbarapp.com/) (formerly BitBar)
+- Python 3.8+
+- `desktop-notifier` (recommended, for rich notifications): `pip3 install desktop-notifier`
 
-Download [Security Growler Light.app](https://github.com/pirate/security-growler/raw/master/Security%20Growler%20Light.app.zip) if you don't use OS X Dark Mode.
-If you prefer [Growl](http://growl.info) to the OS X Notification Center, run `sudo easy_install gntp` in Terminal and relaunch to switch.
+## Installation
 
-Note: the app **must** be run under an account that has read access to `cat /var/log/system.log` (i.e. run by an admin).  It will not function under a non-admin-permissions account on mac, as it needs access to several root-owned logfiles to be of any use.
-Running this app as a non-admin user simply doesn't make sense, because it wouldn't be able to alert on any log events in `/var/log/system.log` or on ports opened by other users.  It would be of very
-limited use, and would very few security assurances if it could only alert on sockets opened by your own user account.
+### Quick Install
 
-## It can do cool things like:
+1. Install [xbar](https://xbarapp.com/) if you haven't already
+2. Install the notification library:
+   ```bash
+   pip3 install desktop-notifier
+   ```
+3. Copy `security-growler.30s.py` to your xbar plugins folder:
+   ```bash
+   cp security-growler.30s.py ~/Library/Application\ Support/xbar/plugins/
+   chmod +x ~/Library/Application\ Support/xbar/plugins/security-growler.30s.py
+   ```
+4. Refresh xbar or click the xbar icon and select "Refresh all"
 
-**Alert you of attempted and successful SSH logins:**
+### Manual Install
 
-<img src="http://pirate.github.io/security-growler/screenshots/ssh_fail_event.PNG" width="40%"/>
-<img src="http://pirate.github.io/security-growler/screenshots/ssh_key_event.PNG" width="40%"/>
+1. Download `security-growler.30s.py` from this repository
+2. Move it to `~/Library/Application Support/xbar/plugins/`
+3. Make it executable: `chmod +x security-growler.30s.py`
+4. Refresh xbar
 
-**Notify you of incoming & outgoing TCP connections: FTP, VNC, SMB, MySQL, etc.:**
+## Configuration
 
-(using [less RAM](https://github.com/pirate/security-growler#background) than Little Snitch)  
+Configuration is done through xbar's plugin variables. Click on the plugin in xbar, then go to the xbar app preferences to modify these settings:
 
-<img src="http://pirate.github.io/security-growler/screenshots/vnc_event.PNG" width="40%"/>
-<img src="http://pirate.github.io/security-growler/screenshots/connection_event.PNG" width="40%"/>
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `SHOW_NOTIFICATIONS` | `true` | Enable/disable macOS notifications |
+| `MONITOR_SSH` | `true` | Monitor SSH login events |
+| `MONITOR_SUDO` | `true` | Monitor sudo command usage |
+| `MONITOR_PORTSCAN` | `true` | Detect incoming port scans |
+| `MONITOR_VNC` | `true` | Monitor VNC (port 5900) connections |
+| `MONITOR_PORTS` | `true` | Monitor network connections on specified ports |
+| `MONITORED_PORTS` | `21,445,548,3306,3689,5432` | Comma-separated list of ports to monitor |
 
-**Notify you whenever a command is run with `sudo`:**
+### Monitored Ports
 
-<img src="http://pirate.github.io/security-growler/screenshots/sudo_context.PNG" height="350px"/>
+Default ports monitored:
+- **21**: FTP
+- **445**: SMB (Windows file sharing)
+- **548**: AFP (Apple file sharing)
+- **3306**: MySQL
+- **3689**: iTunes Sharing
+- **5432**: PostgreSQL
+- **5900**: VNC (always monitored separately as high-priority)
 
-**Let you know when you're being portscanned:**
+## How It Works
 
-<img src="http://pirate.github.io/security-growler/screenshots/portscan_context.PNG" height="350px"/>
+Security Growler uses the macOS **unified logging system** (`/usr/bin/log`) to query security-relevant events. This is the modern approach that works on macOS Catalina and later, replacing the deprecated `/var/log/system.log` file.
 
-[More Screenshots...](https://github.com/pirate/security-growler/tree/gh-pages/screenshots)
+The plugin:
+1. Queries the unified log for SSH, sudo, port scan, and FTP events
+2. Monitors network connections using `lsof` for configured ports
+3. Tracks seen events to avoid duplicate notifications
+4. Outputs a menu showing recent events and monitoring status
+5. Sends native macOS notifications for new security events
 
+### Event Persistence
 
-## Documentation:
+State is stored in `~/Library/Application Support/SecurityGrowler/state.json` to track:
+- Previously seen log events (prevents duplicate alerts)
+- Known network connections (alerts only on new connections)
+- Recent event history (shown in the menu)
 
-The currently working alert types are:
+Logs are written to `~/Library/Logs/SecurityGrowler.log`.
 
- * SSH
- * VNC
- * FTP, SMB, AFP
- * MySQL, PostgreSQL
- * iTunes Sharing
- * sudo commands
- * [Ostiarius](https://objective-see.com/products/ostiarius.html)
- * port-scans (e.g. if you're on the receiving end of nmap)
+## Responding to Alerts
 
-**Get more alerts like Wifi, VPN, LAN, bluetooth, USB device and other config changes using [HardwareGrowler](https://www.macupdate.com/app/mac/40750/hardwaregrowler) and [MetaGrowler](http://en.freedownloadmanager.org/Mac-OS/MetaGrowler-FREE.html).**
+| Alert Type | Recommended Action |
+|------------|-------------------|
+| SSH Connection | Check `System Preferences > Sharing > Remote Login`. Review with `w` command. |
+| VNC Connection | Check `System Preferences > Sharing > Screen Sharing`. |
+| Port Scan | Enable firewall stealth mode: `sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setstealthmode on` |
+| Sudo Command | Review with `last` and check Activity Monitor for unexpected processes |
+| Port Connection | Ensure the service (MySQL, PostgreSQL, etc.) is properly secured with authentication |
 
-TODO:
- * new alerts types like ARP resolution, DNS resolution, etc. tracked via [issues](https://github.com/pirate/security-growler/issues/)
- * keychain auth events (`/var/log/authd.log`, `/var/log/accountpolicy.log`)
- * new listening sockets under port 1000 opened
+## Troubleshooting
 
-### Config:
+### No events appearing?
 
-Settings are changed by editing a text file `settings.py`, accessible via the menubar dropdown item 'Settings...'.
+1. **Check unified log access**: The unified log may require specific entitlements. Run manually to test:
+   ```bash
+   /usr/bin/log show --predicate 'process == "sshd"' --last 5m
+   ```
 
-**To enable or disable alert types:**
+2. **Refresh the plugin**: Click the shield icon and select "Refresh Now"
 
-You can enable and disable certain alerts by editing the `WATCHED_SOURCES` section of the file.
-Add or remove event sources on the left (either port numbers or logfile paths), and put the parser names you want to enable for each source on the right.  Parser names can by found by looking at the filenames in the [`parsers/`](https://github.com/pirate/security-growler/tree/master/parsers) folder.
+3. **Check for Python errors**: Look at the plugin output for error messages
 
-```python
-# this config alerts for FTP, iTunes Sharing, sudo, & SSH
-WATCHED_SOURCES = {
-    21:                    'connections',      # FTP
-    3689:                  'connections',      # iTunes Sharing
-    '/var/log/system.log': ('sudo', 'ssh'),    # sudo & ssh
-}
-```
+### Notifications not working?
 
-**To enable or disable alert methods, such as Notification Center or Growl:**
+1. Install desktop-notifier: `pip3 install desktop-notifier`
+2. Check System Preferences > Notifications > Script Editor (or Terminal) permissions
+3. The fallback uses osascript which should work without additional setup
 
-Change the `LOGGERS` section to suit your needs.
+### Plugin not appearing in xbar?
 
-```python
-LOGGERS = [
-    'stdout',
-    'logfile',
-    'growl',
-    # 'osxnotifications',  # prepend a hash to disable a certain method
-]
-```
+1. Ensure the file is executable: `chmod +x security-growler.30s.py`
+2. Check the file is in the correct location
+3. Verify Python 3 is available: `which python3`
 
-**To change notification preferences:**
+## Related Tools
 
-Change `POLLING_SPEED` to make the app update more or less frequently (2-10 seconds is recommended).
+- [Lulu](https://objective-see.com/products/lulu.html) - Free, open-source firewall
+- [Little Snitch](https://www.obdev.at/products/littlesnitch/index.html) - Comprehensive firewall solution
+- [KnockKnock](https://objective-see.com/products/knockknock.html) - Detect persistent malware
 
-Change the `INFO_` and `ALERT_` items to modify properties such as alert sounds, icons, and text.
+## License
 
+MIT License - See source file for full license text.
 
-### How should you respond to alerts?
+Copyright (c) Nick Sweeting
 
-In general, don't assume you're being attacked just because you get an alert, there are many possible situations where you may get false positives.  That being said, it's good to have some documented responses in case you actually are being attacked.  Here are some safe recommendations for what to do if you get different alerts in order to protect your system.
-
- - New TCP connections: make sure the affected service (e.g. postgresql) is not publicly accessible, or has a strong password set (check your configs and firewall)
- - New SSH connections: turn off Remote Login (ssh) under `System Preferences > Sharing > Remote Login`
- - New VNC connections: turn off Screen Sharing & Remote Administration under `System Preferences > Sharing > Screen Sharing/Remote Administration`
- - New FTP/AFP/SMB connections: turn off file sharing under `System Preferences > Sharing > File Sharing`
- - iTunes Sharing: turn off iTunes sharing under `iTunes > Preferences... > Sharing > Share my library on my local network`
- - Port scans: unplug your ethernet cable, turn off public services, or turn on your firewall to stealth mode: `sudo defaults write /Library/Preferences/com.apple.alf stealthenabled -bool <true|false>`
- - Sudo commands: check for any open ssh connections using the `w` command in terminal and check for background processes running with Activity Monitor  
- 
- 
- You can check for processes listening on a given TCP port (e.g. 80) using `sudo lsof +c 0 -i:80`.  
- You can see active network connections with `sudo netstat -t` or `iftop` (`brew install iftop`).  
- You can check for persistent background tasks and unauthorized processes running using [KnockKnock](https://objective-see.com/products/knockknock.html) and [TaskExplorer](https://objective-see.com/products/taskexplorer.html).
-
-
-## Developer Info:
-
-This app is composed of 3 main parts: `sources`, `parsers`, and `loggers`.
-
- * [`sources`](https://github.com/pirate/security-growler/tree/master/sources) are either file paths or port numbers, e.g. `/var/log/system.log` or `5900`
- * [`parsers`](https://github.com/pirate/security-growler/tree/master/parsers) e.g. `ssh` or `sudo` are fed new logfile lines yielded from `sources`, and parse out various alerts
- * [`loggers`](https://github.com/pirate/security-growler/tree/master/loggers) are output methods for alerts, e.g. `stdout`, `osxnotifications`, or `growl`
-
-The main runloop is in [`growler.py`](https://github.com/pirate/security-growler/blob/master/growler.py), it reads lines out of the sources, passes them through parsers, then dispatches alerts before waiting a short delay and then looping.
-
-The [menubar app](https://github.com/pirate/security-growler/tree/master/Security%20Growler.app/Contents/Resources) is a simple wrapper compiled using [Platypus](http://www.macupdate.com/app/mac/12046/platypus).  `Security Growler.app` is packaged with copies of `growler.py` and all the other files it needs.
-To make changes to the app, change the files you need, test using `sudo python growler.py` and `sudo ./menubar.sh`, then re-run Platypus to generate a new app.
-
-The menubar app works by displaying the output of `menubar.sh`, and spawning a `growler.py` agent in the background to write new events to a logfile.
-See [`menubar.sh`](https://github.com/pirate/security-growler/blob/master/menubar.sh) for more details.
-
-The python Foundation library that provides access to OS X API's like notification center is not available by default for python3.5, so for the moment only 2.7 is supported.
-
-## Background:
-
-I was tired of not being able to find an app that would quell my paranoia about open ports, so I made one myself. Now I can relax whenever I'm in a seedy internet cafe or connected to free Boingo airport wifi because I know if anyone is trying to connect to my computer.
-
-[Little Snitch](https://www.obdev.at/products/littlesnitch/index.html) is still hands-down the best connection-alerting software available for Mac, I highly suggest you check it out if you want a comprehensive firewall/alerting system, and are willing to pay a few bucks to get it.  Security Growler is centered around parsing logfiles for any kind of generic pattern, not just monitoring the TCP connection table like Little Snitch.  For example, my app can alert you of `sudo` events, keychain auth events, and anything else you can think of that's reported to a logfile.  This app is significantly more lightweight than Little Snitch, it comes in at <15mb of RAM used, because it aims to solve a simpler problem than Little Snitch.  This app is not designed to *prevent* malicious connections, that's what firewalls are for, it's just meant to keep an unobtrusive log, and alert you whenever important security events are happening.  The more informed you are, the better you can protect yourself.
-
-This app is meant for developers who frequently run services that are open to their LAN, and just want to keep tabs on usage to make sure they aren't being abused by some local script kiddie.  Since the target audience is developers, I opted to leave some parts a little less user-friendly, such as the `settings.py` config system.  It's also just plain fun to enable lots of alerts types if you like to see every little detail of your computer's operation.
-
-Feel free to submit a [pull-request](https://github.com/pirate/security-growler/pulls) and add a [new parser](https://github.com/pirate/security-growler/blob/master/parsers/vnc.py) (e.g. try writing one for nginx http-auth)!
-
-Basic Linux support will be finished soon, in the meantime check out a similar project written by [@benjojo](https://github.com/benjojo): [PushAlotAuth](https://github.com/benjojo/PushAlotAuth), it uses the [PushALot](https://pushalot.com/) push-notification platform.
-
-Also check out our growing list of community-shared [useful Mac menubar apps](https://github.com/pirate/security-growler/issues/32)!
-
-**Some security apps I recommend:**
- - [HardwareGrowler](https://www.macupdate.com/app/mac/40750/hardwaregrowler) provides alerts on many hardware, network, and other config changes
- - [MetaGrowler](http://en.freedownloadmanager.org/Mac-OS/MetaGrowler-FREE.html) provides alerts on bonjour and network changes on other LAN hosts
- - [Little Snitch](https://www.obdev.at/products/littlesnitch/index.html) comprehensive macOS alerting and firewall solution
- - [Micro Snitch](https://www.obdev.at/products/microsnitch/index.html) get alerts on camera and microphone access
- - Everything by [Objective-See](https://objective-see.com/products.html), a great security app developer
- - [CIRCL ALOD](http://www.circl.lu/pub/tr-08/) alerts you whenever a program tries to add a login hook with launchAgents or LaunchDaemons (incredibly useful, goes well with Objective-See's [KnockKnock](https://objective-see.com/products/knockknock.html))
-
-## License:
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, pulverize, distribute, synergize, compost, defenestrate, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-If the Author of the Software (the "Author") needs a place to crash and you have a sofa available, you should maybe give the Author a break and let him sleep on your couch.
-
-If you are caught in a dire situation wherein you only have enough time to save one person out of a group, and the Author is a member of that group, you must save the Author.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO BLAH BLAH BLAH ISN'T IT FUNNY HOW UPPER-CASE MAKES IT SOUND LIKE THE LICENSE IS ANGRY AND SHOUTING AT YOU.
-
-
-
-<img src="http://pirate.github.io/security-growler/screenshots/menubar_3.PNG" width="100%"/>
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software to deal in the Software without restriction, including the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies.
