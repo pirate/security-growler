@@ -15,22 +15,24 @@ You can even forward alerts as push notifications to your iOS devices using [Pro
 
 **Requirements:**
 - macOS 10.15+ (Catalina or later)
-- [xbar](https://xbarapp.com/) (formerly BitBar)
+- [SwiftBar](https://github.com/swiftbar/SwiftBar) or [xbar](https://xbarapp.com/) (formerly BitBar)
 - Python 3.8+
 
 **Steps:**
 
-1. Install [xbar](https://xbarapp.com/) if you haven't already
-2. Install the notification library (optional but recommended):
+1. Install [SwiftBar](https://github.com/swiftbar/SwiftBar) or [xbar](https://xbarapp.com/)
    ```bash
-   pip3 install desktop-notifier
+   brew install swiftbar
+   pip3 install desktop-notifier   # Install the notification library (optional but recommended)
    ```
-3. Copy `security-growler.30s.py` to your xbar plugins folder:
+2. Download [`security-growler.30s.py`](https://raw.githubusercontent.com/pirate/security-growler/refs/heads/master/security-growler.30s.py) to your SwiftBar/xbar/bitbar plugins folder:
    ```bash
-   cp security-growler.30s.py ~/Library/Application\ Support/xbar/plugins/
-   chmod +x ~/Library/Application\ Support/xbar/plugins/security-growler.30s.py
+   mkdir -p ~/Library/Application\ Support/xbar/plugins
+   cd ~/Library/Application\ Support/xbar/plugins
+   curl -sSL https://raw.githubusercontent.com/pirate/security-growler/refs/heads/master/security-growler.30s.py > security-growler.30s.py
+   chmod +x security-growler.30s.py
    ```
-4. Refresh xbar or click the xbar icon and select "Refresh all"
+3. Refresh SwiftBar or click the xbar icon and select "Refresh all"
 
 <img src="http://pirate.github.io/security-growler/screenshots/menubar_2.PNG" width="45%"/>
 <img src="http://pirate.github.io/security-growler/screenshots/menubar_1.PNG" width="45%"/>
@@ -65,11 +67,11 @@ You can even forward alerts as push notifications to your iOS devices using [Pro
 The currently working alert types are:
 
 **Core Security Events:**
+ * New listening ports opened on localhost
  * SSH login attempts (successful and failed)
  * VNC remote desktop connections
  * FTP, SMB, AFP file sharing connections
  * MySQL, PostgreSQL database connections
- * iTunes Sharing connections
  * sudo command execution
  * Port scans (nmap-style detection)
 
@@ -82,13 +84,10 @@ The currently working alert types are:
 
 **File & Process Monitoring:**
  * New `.env` files created in home directory (via Spotlight)
- * Dangerous command execution (`npx`, `uvx`, `op`)
+ * Dangerous command execution (`npx`, `uvx`, `op`) (BETA, not perfect yet)
  * Kandji/MDM management events
 
 **Get more alerts like Wifi, VPN, LAN, bluetooth, USB device and other config changes using [HardwareGrowler](https://www.macupdate.com/app/mac/40750/hardwaregrowler) and [MetaGrowler](http://en.freedownloadmanager.org/Mac-OS/MetaGrowler-FREE.html).**
-
-TODO:
- * keychain auth events
 
 ### Config
 
@@ -158,7 +157,7 @@ In general, don't assume you're being attacked just because you get an alert, th
 The plugin is a single Python 3 script (`security-growler.30s.py`) that uses:
 
 - **macOS Unified Logging**: Queries `/usr/bin/log` with predicates to detect SSH, sudo, portscan, FTP, and MDM events
-- **Shell history**: Monitors ~/.zsh_history, ~/.bash_history, ~/.local/share/fish/fish_history for dangerous commands (npx, uvx, op) - catches even short-lived commands
+- **Shell history**: Monitors ~/.zsh_history, ~/.bash_history, ~/.local/share/fish/fish_history for dangerous commands (npx, uvx, op) (to help discourage Shai-Hulud style infections via post-install scripts)
 - **ps**: Also polls for currently running dangerous commands as backup
 - **lsof**: Monitors TCP connections and listening ports
 - **find**: Detects new .env files created in home directory (excludes Library, .git, node_modules)
@@ -179,7 +178,7 @@ Feel free to submit a [pull-request](https://github.com/pirate/security-growler/
 
 ## Background
 
-I was tired of not being able to find an app that would quell my paranoia about open ports, so I made one myself. Now I can relax whenever I'm in a seedy internet cafe or connected to free Boingo airport wifi because I know if anyone is trying to connect to my computer.
+I was tired of not being able to find an app that would quell my paranoia about open ports, so I made one myself. Now I can relax whenever I'm in a seedy internet cafe or connected to free Boingo airport wifi because I know if anyone is trying to connect to my computer. I originally built this in ~2014 and only maintained it for a few years. It was archived for almost 6 years and I just recently revived in 2025 with the help of Claude Code to modernize it for macOS Tahoe.
 
 [Little Snitch](https://www.obdev.at/products/littlesnitch/index.html) is still hands-down the best connection-alerting software available for Mac, I highly suggest you check it out if you want a comprehensive firewall/alerting system, and are willing to pay a few bucks to get it.  Security Growler is centered around parsing logfiles for any kind of generic pattern, not just monitoring the TCP connection table like Little Snitch.  For example, my app can alert you of `sudo` events, keychain auth events, and anything else you can think of that's reported to a logfile.  This app is significantly more lightweight than Little Snitch, it comes in at <15mb of RAM used, because it aims to solve a simpler problem than Little Snitch.  This app is not designed to *prevent* malicious connections, that's what firewalls are for, it's just meant to keep an unobtrusive log, and alert you whenever important security events are happening.  The more informed you are, the better you can protect yourself.
 
@@ -206,7 +205,6 @@ If the Author of the Software (the "Author") needs a place to crash and you have
 If you are caught in a dire situation wherein you only have enough time to save one person out of a group, and the Author is a member of that group, you must save the Author.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO BLAH BLAH BLAH ISN'T IT FUNNY HOW UPPER-CASE MAKES IT SOUND LIKE THE LICENSE IS ANGRY AND SHOUTING AT YOU.
-
 
 
 <img src="http://pirate.github.io/security-growler/screenshots/menubar_3.PNG" width="100%"/>
