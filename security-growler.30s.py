@@ -55,22 +55,60 @@ LOG_FILE = Path.home() / "Library" / "Logs" / "SecurityGrowler.log"
 MAX_EVENTS = 50
 MAX_LOG_LINES = 1000
 
-# Environment variable configuration (set by xbar)
-SHOW_NOTIFICATIONS = os.environ.get("SHOW_NOTIFICATIONS", "true").lower() == "true"
-MONITOR_SSH = os.environ.get("MONITOR_SSH", "true").lower() == "true"
-MONITOR_SUDO = os.environ.get("MONITOR_SUDO", "true").lower() == "true"
-MONITOR_PORTSCAN = os.environ.get("MONITOR_PORTSCAN", "true").lower() == "true"
-MONITOR_VNC = os.environ.get("MONITOR_VNC", "true").lower() == "true"
-MONITOR_PORTS = os.environ.get("MONITOR_PORTS", "true").lower() == "true"
+# Monitor toggle management
+def get_monitor_overrides() -> Dict[str, bool]:
+    """Load monitor toggle overrides from state file."""
+    STATE_DIR.mkdir(parents=True, exist_ok=True)
+    overrides_file = STATE_DIR / "monitor_overrides.json"
+    if overrides_file.exists():
+        try:
+            with open(overrides_file, "r") as f:
+                return json.load(f)
+        except (json.JSONDecodeError, IOError):
+            pass
+    return {}
+
+def toggle_monitor(monitor_name: str) -> None:
+    """Toggle a monitor on/off by storing override in state."""
+    STATE_DIR.mkdir(parents=True, exist_ok=True)
+    overrides_file = STATE_DIR / "monitor_overrides.json"
+
+    # Load current overrides
+    overrides = get_monitor_overrides()
+
+    # Get current effective state (env var default, then override)
+    env_default = os.environ.get(monitor_name, "true").lower() == "true"
+    current_state = overrides.get(monitor_name, env_default)
+
+    # Toggle it
+    overrides[monitor_name] = not current_state
+
+    # Save
+    with open(overrides_file, "w") as f:
+        json.dump(overrides, f, indent=2)
+
+def is_monitor_enabled(monitor_name: str, env_default: str = "true") -> bool:
+    """Check if a monitor is enabled, considering both env vars and overrides."""
+    env_value = os.environ.get(monitor_name, env_default).lower() == "true"
+    overrides = get_monitor_overrides()
+    return overrides.get(monitor_name, env_value)
+
+# Environment variable configuration (set by xbar, can be overridden by user toggles)
+SHOW_NOTIFICATIONS = is_monitor_enabled("SHOW_NOTIFICATIONS")
+MONITOR_SSH = is_monitor_enabled("MONITOR_SSH")
+MONITOR_SUDO = is_monitor_enabled("MONITOR_SUDO")
+MONITOR_PORTSCAN = is_monitor_enabled("MONITOR_PORTSCAN")
+MONITOR_VNC = is_monitor_enabled("MONITOR_VNC")
+MONITOR_PORTS = is_monitor_enabled("MONITOR_PORTS")
 MONITORED_PORTS = os.environ.get("MONITORED_PORTS", "21,445,548,3306,3689,5432")
-MONITOR_LISTENING = os.environ.get("MONITOR_LISTENING", "true").lower() == "true"
-MONITOR_DOTENV = os.environ.get("MONITOR_DOTENV", "true").lower() == "true"
-MONITOR_DANGEROUS_COMMANDS = os.environ.get("MONITOR_DANGEROUS_COMMANDS", "true").lower() == "true"
-MONITOR_DNS = os.environ.get("MONITOR_DNS", "true").lower() == "true"
-MONITOR_PUBLIC_IP = os.environ.get("MONITOR_PUBLIC_IP", "true").lower() == "true"
-MONITOR_LOCAL_IP = os.environ.get("MONITOR_LOCAL_IP", "true").lower() == "true"
-MONITOR_MDM = os.environ.get("MONITOR_MDM", "true").lower() == "true"
-MONITOR_ARP_SPOOF = os.environ.get("MONITOR_ARP_SPOOF", "true").lower() == "true"
+MONITOR_LISTENING = is_monitor_enabled("MONITOR_LISTENING")
+MONITOR_DOTENV = is_monitor_enabled("MONITOR_DOTENV")
+MONITOR_DANGEROUS_COMMANDS = is_monitor_enabled("MONITOR_DANGEROUS_COMMANDS")
+MONITOR_DNS = is_monitor_enabled("MONITOR_DNS")
+MONITOR_PUBLIC_IP = is_monitor_enabled("MONITOR_PUBLIC_IP")
+MONITOR_LOCAL_IP = is_monitor_enabled("MONITOR_LOCAL_IP")
+MONITOR_MDM = is_monitor_enabled("MONITOR_MDM")
+MONITOR_ARP_SPOOF = is_monitor_enabled("MONITOR_ARP_SPOOF")
 
 # Listening port range to monitor
 LISTENING_PORT_MIN = 21
@@ -1575,43 +1613,34 @@ def format_xbar_output(state: Dict[str, Any], new_events: List[Tuple[str, str, s
     print(f"Last check: {datetime.now().strftime('%H:%M:%S')} | color=#666666 size=11")
     print("---")
 
-    # Active monitors
+    # Active monitors - clickable to toggle
     print("Active Monitors | color=#333333")
-    monitors = []
-    if MONITOR_SSH:
-        monitors.append("SSH")
-    if MONITOR_SUDO:
-        monitors.append("Sudo")
-    if MONITOR_PORTSCAN:
-        monitors.append("Port Scans")
-    if MONITOR_VNC:
-        monitors.append("VNC")
-    if MONITOR_PORTS:
-        port_list = ", ".join(str(p) for p in PORTS_TO_MONITOR[:3])
-        if len(PORTS_TO_MONITOR) > 3:
-            port_list += f" (+{len(PORTS_TO_MONITOR) - 3})"
-        monitors.append(f"Ports: {port_list}")
-    if MONITOR_LISTENING:
-        monitors.append(f"Listening ({LISTENING_PORT_MIN}-{LISTENING_PORT_MAX})")
-    if MONITOR_DOTENV:
-        monitors.append(".env Files")
-    if MONITOR_DANGEROUS_COMMANDS:
-        monitors.append(f"Commands: {', '.join(DANGEROUS_COMMANDS)}")
-    if MONITOR_DNS:
-        monitors.append("DNS Resolvers")
-    if MONITOR_PUBLIC_IP:
-        public_ip = state.get("known_public_ip", "?")
-        monitors.append(f"Public IP ({public_ip})")
-    if MONITOR_LOCAL_IP:
-        monitors.append("Local IPs")
-    if MONITOR_MDM:
-        monitors.append("Kandji/MDM")
-    if MONITOR_ARP_SPOOF:
-        gateway_mac = state.get("known_gateway_mac", "?")[:8] if state.get("known_gateway_mac") else "?"
-        monitors.append(f"ARP Spoofing (GW: {gateway_mac}...)")
+    script_path = os.path.abspath(__file__)
 
-    for m in monitors:
-        print(f"--✓ {m} | color=#228B22 size=12")
+    # Define all monitors with their display names and environment variable names
+    monitor_configs = [
+        ("MONITOR_SSH", MONITOR_SSH, "SSH"),
+        ("MONITOR_SUDO", MONITOR_SUDO, "Sudo"),
+        ("MONITOR_PORTSCAN", MONITOR_PORTSCAN, "Port Scans"),
+        ("MONITOR_VNC", MONITOR_VNC, "VNC"),
+        ("MONITOR_PORTS", MONITOR_PORTS, f"Ports: {', '.join(str(p) for p in PORTS_TO_MONITOR[:3])}{f' (+{len(PORTS_TO_MONITOR) - 3})' if len(PORTS_TO_MONITOR) > 3 else ''}"),
+        ("MONITOR_LISTENING", MONITOR_LISTENING, f"Listening ({LISTENING_PORT_MIN}-{LISTENING_PORT_MAX})"),
+        ("MONITOR_DOTENV", MONITOR_DOTENV, ".env Files"),
+        ("MONITOR_DANGEROUS_COMMANDS", MONITOR_DANGEROUS_COMMANDS, f"Commands: {', '.join(DANGEROUS_COMMANDS)}"),
+        ("MONITOR_DNS", MONITOR_DNS, "DNS Resolvers"),
+        ("MONITOR_PUBLIC_IP", MONITOR_PUBLIC_IP, f"Public IP ({state.get('known_public_ip', '?')})"),
+        ("MONITOR_LOCAL_IP", MONITOR_LOCAL_IP, "Local IPs"),
+        ("MONITOR_MDM", MONITOR_MDM, "Kandji/MDM"),
+        ("MONITOR_ARP_SPOOF", MONITOR_ARP_SPOOF, f"ARP Spoofing (GW: {state.get('known_gateway_mac', '?')[:8] if state.get('known_gateway_mac') else '?'}...)"),
+    ]
+
+    for var_name, is_enabled, display_name in monitor_configs:
+        if is_enabled:
+            # Show enabled monitors with checkmark - clickable to disable
+            print(f"--✓ {display_name} | color=#228B22 size=12 bash={script_path} param1=toggle param2={var_name} terminal=false refresh=true")
+        else:
+            # Show disabled monitors with gray text - clickable to enable
+            print(f"--○ {display_name} | color=#999999 size=12 bash={script_path} param1=toggle param2={var_name} terminal=false refresh=true")
 
     print("---")
 
@@ -1669,6 +1698,13 @@ def format_xbar_output(state: Dict[str, Any], new_events: List[Tuple[str, str, s
 
 def main():
     """Main entry point for the xbar plugin."""
+    # Check if we're being called to toggle a monitor
+    if len(sys.argv) > 1 and sys.argv[1] == "toggle":
+        if len(sys.argv) > 2:
+            monitor_name = sys.argv[2]
+            toggle_monitor(monitor_name)
+        sys.exit(0)
+
     try:
         # Load state
         state = load_state()
