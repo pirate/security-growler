@@ -632,9 +632,20 @@ def parse_port_events(state: Dict[str, Any]) -> List[Tuple[str, str, str]]:
 
                 port_name = PORT_NAMES.get(port, str(port))
                 title = f"PORT {port} ({port_name})"
-                body = f"{conn['user']} {conn['process']} (PID {conn['pid']})"
+
+                # Determine connection direction
+                # If we have local->remote in lsof output, it's an outgoing connection
+                # If we just have a remote without ->, it means remote connected to us (incoming)
                 if conn.get("remote"):
-                    body += f" <- {conn['remote']}"
+                    if conn.get("local") and "->" in conn.get("name", ""):
+                        # Outgoing: we initiated the connection
+                        body = f"{conn['process']}@localhost -> {conn['remote']}"
+                    else:
+                        # Incoming: remote connected to us
+                        body = f"{conn['remote']} -> {conn['process']}@localhost:{port}"
+                else:
+                    # No remote info, just show the process
+                    body = f"{conn['user']} {conn['process']} (PID {conn['pid']})"
 
                 events.append(("notify", title, body))
 
@@ -670,9 +681,20 @@ def parse_vnc_events(state: Dict[str, Any]) -> List[Tuple[str, str, str]]:
             known[port_key].append(conn_id)
 
             title = "VNC CONNECTION"
-            body = f"{conn['user']} {conn['process']} (PID {conn['pid']})"
+
+            # Determine connection direction
+            # If we have local->remote in lsof output, it's an outgoing connection
+            # If we just have a remote without ->, it means remote connected to us (incoming)
             if conn.get("remote"):
-                body += f" from {conn['remote']}"
+                if conn.get("local") and "->" in conn.get("name", ""):
+                    # Outgoing: we initiated the VNC connection
+                    body = f"{conn['process']}@localhost -> {conn['remote']}"
+                else:
+                    # Incoming: remote connected to our VNC server
+                    body = f"{conn['remote']} -> {conn['process']}@localhost:{port}"
+            else:
+                # No remote info, just show the process
+                body = f"{conn['user']} {conn['process']} (PID {conn['pid']})"
 
             # VNC connections are alerts, not just notifications
             events.append(("alert", title, body))
