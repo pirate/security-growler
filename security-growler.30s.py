@@ -497,6 +497,52 @@ def parse_sudo_events(state: Dict[str, Any]) -> List[Tuple[str, str, str]]:
 # Port Scan Parser
 # =============================================================================
 
+def get_recent_connections() -> List[Dict[str, str]]:
+    """Get recent network connections using lsof to identify port scan sources."""
+    cmd = "lsof -i -n -P 2>/dev/null | grep -v '^COMMAND' | grep -v 'LISTEN'"
+
+    try:
+        result = subprocess.run(
+            cmd,
+            shell=True,
+            capture_output=True,
+            text=True,
+            timeout=10
+        )
+
+        connections = []
+        seen_sources = set()
+
+        for line in result.stdout.strip().splitlines():
+            parts = line.split()
+            if len(parts) >= 9:
+                # Parse lsof output
+                # PROCESS PID USER FD TYPE DEVICE SIZE/OFF NODE NAME
+                name = parts[-1] if parts else ""
+
+                # Look for connections with remote addresses
+                if "->" in name:
+                    local, remote = name.split("->", 1)
+                    # Extract remote IP (before the port)
+                    if ":" in remote:
+                        remote_ip = remote.rsplit(":", 1)[0]
+                        # Avoid duplicates
+                        if remote_ip and remote_ip not in seen_sources:
+                            seen_sources.add(remote_ip)
+                            connections.append({
+                                "process": parts[0],
+                                "pid": parts[1],
+                                "user": parts[2],
+                                "remote_ip": remote_ip,
+                                "full_connection": name,
+                            })
+
+        return connections
+
+    except (subprocess.TimeoutExpired, subprocess.SubprocessError):
+        return []
+
+
 def parse_portscan_events(state: Dict[str, Any]) -> List[Tuple[str, str, str]]:
     """Parse port scan detection events from unified log."""
     if not MONITOR_PORTSCAN:
@@ -519,8 +565,23 @@ def parse_portscan_events(state: Dict[str, Any]) -> List[Tuple[str, str, str]]:
         if "Limiting closed port RST response" in message:
             # Extract rate limit info
             rate_info = message.split("response ", 1)[-1] if "response " in message else message
+
+            # Try to identify the source of the port scan
+            recent_connections = get_recent_connections()
+
             title = "PORT SCAN DETECTED"
-            body = f"Limiting {rate_info}"
+            if recent_connections:
+                # Get unique source IPs
+                source_ips = list(set(conn["remote_ip"] for conn in recent_connections[:5]))
+                if len(source_ips) == 1:
+                    body = f"from {source_ips[0]} - Limiting {rate_info}"
+                elif len(source_ips) <= 3:
+                    body = f"from {', '.join(source_ips)} - Limiting {rate_info}"
+                else:
+                    body = f"from {source_ips[0]} (+{len(source_ips)-1} more) - Limiting {rate_info}"
+            else:
+                body = f"Limiting {rate_info} (source unknown)"
+
             events.append(("alert", title, body))
             state["seen_events"].append(event_id)
 
