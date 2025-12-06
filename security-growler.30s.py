@@ -1536,6 +1536,70 @@ def collect_all_events(state: Dict[str, Any]) -> List[Tuple[str, str, str]]:
     return all_events
 
 
+def get_event_action_params(event: Dict[str, Any]) -> str:
+    """Generate xbar action parameters for an event to make it clickable."""
+    title = event.get("title", "")
+    body = event.get("body", "")
+    event_type = event.get("type", "")
+
+    # Determine action based on event title/type
+    if "SSH" in title:
+        # Open Console.app and search for SSH logs
+        search_term = body.split("from ")[-1].split(" ")[0] if "from " in body else "sshd"
+        return f'bash=/usr/bin/osascript param1=-e param2=\'tell application "Console" to activate\' terminal=false'
+
+    elif "SUDO" in title:
+        # Open Console.app filtered to sudo
+        return f'bash=/usr/bin/osascript param1=-e param2=\'tell application "Console" to activate\' terminal=false'
+
+    elif "PORT SCAN" in title or "PORT " in title or "VNC" in title:
+        # Show current connections using lsof
+        cmd = 'tell app "Terminal" to do script "echo \'Network Connections:\' && lsof -i -n -P | head -30 && echo \'\nPress any key to close...\' && read -n 1"'
+        return f'bash=/usr/bin/osascript param1=-e param2=\'{cmd}\' terminal=false'
+
+    elif "LISTENING PORT" in title:
+        # Extract port number and show details
+        port_match = title.split(":")[-1].strip()
+        cmd = f'tell app "Terminal" to do script "echo \'Port {port_match} details:\' && lsof -i:{port_match} && echo \'\nPress any key to close...\' && read -n 1"'
+        return f'bash=/usr/bin/osascript param1=-e param2=\'{cmd}\' terminal=false'
+
+    elif ".ENV FILE" in title:
+        # Open the .env file
+        filepath = body.replace("~/", str(Path.home()) + "/")
+        return f'bash=/usr/bin/open param1={filepath} terminal=false'
+
+    elif "DNS RESOLVERS" in title:
+        # Show DNS configuration
+        cmd = 'tell app "Terminal" to do script "echo \'DNS Configuration:\' && scutil --dns && echo \'\nPress any key to close...\' && read -n 1"'
+        return f'bash=/usr/bin/osascript param1=-e param2=\'{cmd}\' terminal=false'
+
+    elif "PUBLIC IP" in title or "LOCAL IP" in title or "INTERFACE" in title:
+        # Show network interface details
+        cmd = 'tell app "Terminal" to do script "echo \'Network Interfaces:\' && ifconfig && echo \'\n\nRouting:\' && netstat -rn && echo \'\nPress any key to close...\' && read -n 1"'
+        return f'bash=/usr/bin/osascript param1=-e param2=\'{cmd}\' terminal=false'
+
+    elif "ARP SPOOF" in title:
+        # Show ARP table
+        cmd = 'tell app "Terminal" to do script "echo \'ARP Table:\' && arp -a && echo \'\nPress any key to close...\' && read -n 1"'
+        return f'bash=/usr/bin/osascript param1=-e param2=\'{cmd}\' terminal=false'
+
+    elif "COMMAND:" in title:
+        # Show process details if still running
+        cmd = f'tell app "Terminal" to do script "echo \'Dangerous Command Alert:\' && echo \'{title}\' && echo \'{body}\' && echo \'\nCurrent processes:\' && ps aux | grep -E \'npx|uvx|op\' | grep -v grep && echo \'\nPress any key to close...\' && read -n 1"'
+        return f'bash=/usr/bin/osascript param1=-e param2=\'{cmd}\' terminal=false'
+
+    elif "MDM" in title:
+        # Show MDM profile info
+        cmd = 'tell app "Terminal" to do script "echo \'MDM Profiles:\' && profiles -P && echo \'\nPress any key to close...\' && read -n 1"'
+        return f'bash=/usr/bin/osascript param1=-e param2=\'{cmd}\' terminal=false'
+
+    else:
+        # Fallback: show event details in a dialog
+        full_details = f"{title}\\n\\n{body}\\n\\nTime: {event.get('time', 'unknown')}"
+        full_details = full_details.replace('"', '\\"').replace("'", "\\'")
+        return f'bash=/usr/bin/osascript param1=-e param2=\'display dialog "{full_details}" with title "Event Details" buttons {{"OK"}} default button 1\' terminal=false'
+
+
 def format_xbar_output(state: Dict[str, Any], new_events: List[Tuple[str, str, str]]) -> None:
     """Format and print xbar-compatible output."""
 
@@ -1626,10 +1690,15 @@ def format_xbar_output(state: Dict[str, Any], new_events: List[Tuple[str, str, s
             title = event["title"][:40]
             time = event["time"]
             color = "#CC0000" if event["type"] == "alert" else "#333333"
-            print(f"--{icon} [{time}] {title} | color={color} size=12")
+
+            # Make event clickable with appropriate action
+            action_params = get_event_action_params(event)
+            print(f"--{icon} [{time}] {title} | color={color} size=12 {action_params}")
+
             if event.get("body"):
                 body = event["body"][:50]
-                print(f"----{body} | color=#666666 size=11")
+                # Body is also clickable with same action
+                print(f"----{body} | color=#666666 size=11 {action_params}")
     else:
         print("No recent events | color=#999999")
 
