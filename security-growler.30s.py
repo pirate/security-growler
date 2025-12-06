@@ -516,9 +516,9 @@ def get_recent_connections() -> List[Dict[str, str]]:
         for line in result.stdout.strip().splitlines():
             parts = line.split()
             if len(parts) >= 9:
-                # Parse lsof output
-                # PROCESS PID USER FD TYPE DEVICE SIZE/OFF NODE NAME
-                name = parts[-1] if parts else ""
+                # Parse lsof output format (9+ fields):
+                # COMMAND PID USER FD TYPE DEVICE SIZE/OFF NODE NAME
+                name = parts[-1]
 
                 # Look for connections with remote addresses
                 if "->" in name:
@@ -526,8 +526,8 @@ def get_recent_connections() -> List[Dict[str, str]]:
                     # Extract remote IP (before the port)
                     if ":" in remote:
                         remote_ip = remote.rsplit(":", 1)[0]
-                        # Avoid duplicates
-                        if remote_ip and remote_ip not in seen_sources:
+                        # Avoid duplicates and filter out invalid IPs
+                        if remote_ip and remote_ip not in seen_sources and not remote_ip.startswith("*"):
                             seen_sources.add(remote_ip)
                             connections.append({
                                 "process": parts[0],
@@ -571,8 +571,8 @@ def parse_portscan_events(state: Dict[str, Any]) -> List[Tuple[str, str, str]]:
 
             title = "PORT SCAN DETECTED"
             if recent_connections:
-                # Get unique source IPs
-                source_ips = list(set(conn["remote_ip"] for conn in recent_connections[:5]))
+                # Get unique source IPs (deduplicate first, then limit display)
+                source_ips = list(set(conn["remote_ip"] for conn in recent_connections))[:5]
                 if len(source_ips) == 1:
                     body = f"from {source_ips[0]} - Limiting {rate_info}"
                 elif len(source_ips) <= 3:
